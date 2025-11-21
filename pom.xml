@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>edu.hm.hafner</groupId>
+    <artifactId>codingstyle-pom</artifactId>
+    <version>5.39.0</version>
+    <relativePath />
+  </parent>
+
+  <artifactId>pit-suppressions-plugin</artifactId>
+  <version>0.1.0</version>
+
+  <packaging>jar</packaging>
+
+  <name>PIT suppressions plugin</name>
+  <description>Provides several mutation filters to suppress PIT mutations.</description>
+
+  <url>https://cs.hm.edu/~hafner</url>
+
+  <licenses>
+    <license>
+      <name>MIT license</name>
+      <comments>All source code is licensed under the MIT license.</comments>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Ullrich Hafner</name>
+      <id>uhafner</id>
+      <email>ullrich.hafner@gmail.com</email>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/uhafner/pit-suppressions-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:uhafner/pit-suppressions-plugin.git</developerConnection>
+    <url>https://github.com/uhafner/pit-suppressions-plugin</url>
+    <tag>${scmTag}</tag>
+  </scm>
+
+  <properties>
+    <scmTag>HEAD</scmTag>
+    <module.name>edu.hm.hafner.pit.suppress</module.name>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
+        <configuration>
+          <packages>
+            <package>edu.hm.hafner.pit.suppress</package>
+          </packages>
+          <entryPointClassPackage>edu.hm.hafner.pit.suppress.assertions</entryPointClassPackage>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>${module.name}</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/*Assert*</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
