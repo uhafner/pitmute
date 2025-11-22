@@ -91,7 +91,7 @@ class FilteredLogTest extends SerializableTest<FilteredLog> {
             filteredLog.logException(new IllegalStateException(String.valueOf(i)), "%d", i);
         }
 
-        Assertions.assertThat(filteredLog.size()).isEqualTo(7);
+        assertThat(filteredLog.size()).isEqualTo(7);
 
         return filteredLog;
     }
