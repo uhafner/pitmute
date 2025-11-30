@@ -48,6 +48,15 @@
     <module.name>edu.hm.hafner.pit.suppress</module.name>
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.pitest</groupId>
+      <artifactId>pitest-entry</artifactId>
+      <version>1.21.1</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
