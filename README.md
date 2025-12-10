@@ -1,10 +1,10 @@
-# PIT suppression plugin
+# PitMute
 
-[![CI on all platforms](https://github.com/uhafner/pit-suppressions-plugin/workflows/GitHub%20CI/badge.svg)](https://github.com/uhafner/pit-suppressions-plugin/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/uhafner/pit-suppressions-plugin/workflows/CodeQL/badge.svg)](https://github.com/uhafner/pit-suppressions-plugin/actions/workflows/codeql.yml)
-[![Line Coverage](https://raw.githubusercontent.com/uhafner/pit-suppressions-plugin/main/badges/line-coverage.svg)](https://github.com/uhafner/pit-suppressions-plugin/actions/workflows/quality-monitor-comment.yml)
-[![Branch Coverage](https://raw.githubusercontent.com/uhafner/pit-suppressions-plugin/main/badges/branch-coverage.svg)](https://github.com/uhafner/pit-suppressions-plugin/actions/workflows/quality-monitor-comment.yml)
-[![Mutation Coverage](https://raw.githubusercontent.com/uhafner/pit-suppressions-plugin/main/badges/mutation-coverage.svg)](https://github.com/uhafner/pit-suppressions-plugin/actions/workflows/quality-monitor-comment.yml)
+[![CI on all platforms](https://github.com/uhafner/pitmute/workflows/GitHub%20CI/badge.svg)](https://github.com/uhafner/pitmute/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/uhafner/pitmute/workflows/CodeQL/badge.svg)](https://github.com/uhafner/pitmute/actions/workflows/codeql.yml)
+[![Line Coverage](https://raw.githubusercontent.com/uhafner/pitmute/main/badges/line-coverage.svg)](https://github.com/uhafner/pitmute/actions/workflows/quality-monitor-comment.yml)
+[![Branch Coverage](https://raw.githubusercontent.com/uhafner/pitmute/main/badges/branch-coverage.svg)](https://github.com/uhafner/pitmute/actions/workflows/quality-monitor-comment.yml)
+[![Mutation Coverage](https://raw.githubusercontent.com/uhafner/pitmute/main/badges/mutation-coverage.svg)](https://github.com/uhafner/pitmute/actions/workflows/quality-monitor-comment.yml)
 
 This PIT plugin provides several mutation filters to suppress PIT mutations. 
 
@@ -18,22 +18,17 @@ All source code is licensed under the MIT license. Contributions to this library
 
 ### Installation
 
-1. Install the jar file
-```
-mvn install:install-file -Dfile=PATH_TO_JAR\pit-suppression-plugin-0.1.0.jar -DgroupId=edu.hm.hafner -DartifactId=pit-suppression-plugin -Dversion=0.1.0 -Dpackaging=jar
-```
-
-2. Add the plugin as a dependency inside the PIT plugin section in your `pom.xml`
+1. Add the plugin as a dependency inside the PIT plugin section in your `pom.xml`
 
 ```xml
 <dependency>
     <groupId>edu.hm.hafner</groupId>
-    <artifactId>pit-suppression-plugin</artifactId>
+    <artifactId>pitmute</artifactId>
     <version>0.1.0</version>
 </dependency>
 ```
 
-3. To use the CSV filter activate the filter feature and specify the path to your CSV file
+2. To use the CSV filter activate the filter feature and specify the path to your CSV file
 
 ```xml
 <configuration>
@@ -41,7 +36,7 @@ mvn install:install-file -Dfile=PATH_TO_JAR\pit-suppression-plugin-0.1.0.jar -Dg
 </configuration>
 ```
 
-4. Create a CSV file with the following format
+3. Create a CSV file with the following format
 
 ```
 className, Mutator, startLine, endLine
@@ -50,6 +45,11 @@ className, Mutator, startLine, endLine
 Only `className` is required. All other fields may be left empty.
 
 If multiple fields are provided, **all conditions must be true** for a mutation to be ignored.
+
+4. Install the plugin
+```
+mvn install
+```
 
 ### CSV Field Explanation
 | Field                | Description                                                                                                                                                                                                                      | Examples                                                                                 |
@@ -93,7 +93,7 @@ If multiple fields are provided, **all conditions must be true** for a mutation 
       <dependencies>
         <dependency>
           <groupId>edu.hm.hafner</groupId>
-          <artifactId>pit-suppression-plugin</artifactId>//todo
+          <artifactId>pitmute</artifactId>
           <version>0.1.0</version>
         </dependency>
       </dependencies>

@@ -11,12 +11,12 @@
     <relativePath/>
   </parent>
 
-  <artifactId>pit-suppression-plugin</artifactId>
+  <artifactId>pitmute</artifactId>
   <version>0.1.0</version>
 
   <packaging>jar</packaging>
 
-  <name>PIT suppression plugin</name>
+  <name>PitMute</name>
   <description>Provides several mutation filters to suppress PIT mutations.</description>
 
   <url>https://cs.hm.edu/~hafner</url>
@@ -37,9 +37,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:https://github.com/uhafner/pit-suppressions-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:uhafner/pit-suppressions-plugin.git</developerConnection>
-    <url>https://github.com/uhafner/pit-suppressions-plugin</url>
+    <connection>scm:git:https://github.com/uhafner/pitmute.git</connection>
+    <developerConnection>scm:git:git@github.com:uhafner/pitmute.git</developerConnection>
+    <url>https://github.com/uhafner/pitmute</url>
     <tag>${scmTag}</tag>
   </scm>
 
@@ -71,7 +71,7 @@
         <dependencies>
           <dependency>
             <groupId>edu.hm.hafner</groupId>
-            <artifactId>pit-suppression-plugin</artifactId>
+            <artifactId>pitmute</artifactId>
             <version>0.1.0</version>
           </dependency>
         </dependencies>

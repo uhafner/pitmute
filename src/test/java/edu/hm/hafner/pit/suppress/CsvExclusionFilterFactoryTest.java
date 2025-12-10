@@ -68,7 +68,7 @@ class CsvExclusionFilterFactoryTest {
 
         assertThat(entries)
                 .hasSize(8)
-                .extracting("className", "mutationName", "startLine", "endLine")
+                .extracting(CsvExclusionEntry::className, CsvExclusionEntry::mutationName, CsvExclusionEntry::startLine, CsvExclusionEntry::endLine)
                 .containsExactly(
                         tuple("ClassName", Optional.empty(), Optional.empty(), Optional.empty()),
                         tuple("ClassName", Optional.of("Mutator"), Optional.empty(), Optional.empty()),

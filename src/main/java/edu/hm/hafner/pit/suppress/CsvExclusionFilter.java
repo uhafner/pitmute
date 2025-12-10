@@ -24,7 +24,7 @@ public class CsvExclusionFilter implements MutationInterceptor {
      * @param entries the list of entries used to exclude mutations.
      */
     public CsvExclusionFilter(final List<CsvExclusionEntry> entries) {
-        this.entries = entries;
+        this.entries = List.copyOf(entries);
     }
 
     @Override
@@ -34,6 +34,7 @@ public class CsvExclusionFilter implements MutationInterceptor {
 
     @Override
     public void begin(ClassTree classTree) {
+        // nothing to do
     }
 
     @Override
@@ -85,5 +86,6 @@ public class CsvExclusionFilter implements MutationInterceptor {
 
     @Override
     public void end() {
+        // nothing to do
     }
 }

@@ -37,11 +37,11 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
     public MutationInterceptor createInterceptor(final InterceptorParameters params) {
         String csvPath = params.settings()
                 .flatMap(settings -> settings.getString("csvFile"))
-                .orElse(null);
+                .orElse("");
 
-        if (csvPath == null || csvPath.isBlank()) {
+        if (csvPath.isBlank()) {
             throw new IllegalStateException("Missing or empty feature parameter \"csvFile\". Please provide the path "
-                    + "to a CSV file, e.g. +FCSV(csvFile[src\\main\\resources\\exclusions.csv]).");
+                    + "to a CSV file, e.g. +FCSV(csvFile[src/main/resources/exclusions.csv]).");
         }
         return new CsvExclusionFilter(getCsvExclusionEntries(csvPath));
     }
@@ -49,18 +49,18 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
     List<CsvExclusionEntry> getCsvExclusionEntries(final String csvPath) {
         List<CsvExclusionEntry> entries = new ArrayList<>();
 
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(csvPath), StandardCharsets.UTF_8)) {
-            String line = br.readLine();
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(csvPath), StandardCharsets.UTF_8);
             int lineNumber = 0;
-            while (line != null) {
+
+            for (String line : lines) {
                 String[] fields = line.split(CSV_SEPARATOR, -1);
 
                 lineNumber++;
                 if (fields.length >= MIN_FIELDS) {
                     Optional<String> classNameOptional = normalize(fields[0]);
                     if (classNameOptional.isEmpty()) {
-                        LOGGER.log(Level.WARNING, "Skipping line because class name is missing: ", lineNumber);
-                        line = br.readLine();
+                        LOGGER.log(Level.WARNING, "Skipping line because class name is missing: {0}", lineNumber);
                         continue;
                     }
 
@@ -73,14 +73,13 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
                         ));
                     }
                     catch (IllegalArgumentException e) {
-                        LOGGER.log(Level.WARNING, "Skipping invalid line: ", lineNumber);
+                        LOGGER.log(Level.WARNING, "Skipping invalid line: {0}", lineNumber);
                     }
                 }
                 else {
                     LOGGER.log(Level.WARNING, "Line should contain four fields (className, mutator (optional), "
-                            + "startLine (optional), endLine (optional)). Skipping invalid line: ", lineNumber);
+                            + "startLine (optional), endLine (optional)). Skipping invalid line: {0}", lineNumber);
                 }
-                line = br.readLine();
             }
             return entries;
         }
