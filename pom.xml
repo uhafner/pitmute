@@ -59,23 +59,24 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.pitest</groupId>
-        <artifactId>pitest-maven</artifactId>
-        <version>1.20.2</version>
-        <configuration>
-          <features>
-            <feature>+FCSV(csvFile[src/main/resources/exclusions.csv])</feature>
-          </features>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>edu.hm.hafner</groupId>
-            <artifactId>pitmute</artifactId>
-            <version>0.1.0</version>
-          </dependency>
-        </dependencies>
-      </plugin>
+<!--      Enable after the first release -->
+<!--      <plugin>-->
+<!--        <groupId>org.pitest</groupId>-->
+<!--        <artifactId>pitest-maven</artifactId>-->
+<!--        <version>1.20.2</version>-->
+<!--        <configuration>-->
+<!--          <features>-->
+<!--            <feature>+FCSV(csvFile[src/main/resources/exclusions.csv])</feature>-->
+<!--          </features>-->
+<!--        </configuration>-->
+<!--        <dependencies>-->
+<!--          <dependency>-->
+<!--            <groupId>edu.hm.hafner</groupId>-->
+<!--            <artifactId>pitmute</artifactId>-->
+<!--            <version>0.1.0</version>-->
+<!--          </dependency>-->
+<!--        </dependencies>-->
+<!--      </plugin>-->
       <plugin>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
