@@ -52,7 +52,7 @@
     <dependency>
       <groupId>org.pitest</groupId>
       <artifactId>pitest-entry</artifactId>
-      <version>1.21.1</version>
+      <version>1.22.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
