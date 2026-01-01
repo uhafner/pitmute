@@ -33,11 +33,24 @@ import java.util.logging.Logger;
 public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
     private static final String CSV_SEPARATOR = ",";
     private static final int MIN_FIELDS = 4;
-    private static Logger logger = Logger.getLogger(CsvExclusionFilterFactory.class.getName());
+    private final Logger logger;
 
+    /**
+     * Creates a {@code CsvExclusionFilterFactory} and initializes the logger.
+     */
+    public CsvExclusionFilterFactory() {
+        this.logger = Logger.getLogger(CsvExclusionFilterFactory.class.getName());
+    }
+
+    /**
+     * Constructor for testing purposes.
+     * Allows injection of a mock logger.
+     *
+     * @param logger the logger to use
+     */
     @VisibleForTesting
-    static void setLogger(final Logger logger) {
-        CsvExclusionFilterFactory.logger = logger;
+    CsvExclusionFilterFactory(final Logger logger) {
+        this.logger = logger;
     }
 
     @Override

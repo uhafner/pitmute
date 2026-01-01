@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class CsvExclusionFilterFactoryTest {
-    private final CsvExclusionFilterFactory factory = new CsvExclusionFilterFactory();
+    private CsvExclusionFilterFactory factory = new CsvExclusionFilterFactory();
 
     @Test
     void shouldCreateCsvExclusionFilterWhenCsvPathIsProvidedAndExists() {
@@ -84,7 +84,7 @@ class CsvExclusionFilterFactoryTest {
     @Test
     void shouldNotAddEntriesWithoutClassName() throws URISyntaxException {
         Logger mockLogger = mock(Logger.class);
-        CsvExclusionFilterFactory.setLogger(mockLogger);
+        factory = new CsvExclusionFilterFactory(mockLogger);
 
         List<CsvExclusionEntry> entries = getEntriesFromFile("ignoredButValidFormattedExclusions.csv");
         assertThat(entries).isEmpty();
@@ -95,7 +95,7 @@ class CsvExclusionFilterFactoryTest {
     @Test
     void shouldDoNothingForEmptyLinesAndComments() throws URISyntaxException {
         Logger mockLogger = mock(Logger.class);
-        CsvExclusionFilterFactory.setLogger(mockLogger);
+        factory = new CsvExclusionFilterFactory(mockLogger);
 
         List<CsvExclusionEntry> entries = getEntriesFromFile("ignoredLines.csv");
         assertThat(entries).isEmpty();
@@ -121,7 +121,7 @@ class CsvExclusionFilterFactoryTest {
     @Test
     void shouldNotAddEntriesWhenExclusionsAreInvalid() throws URISyntaxException {
         Logger mockLogger = mock(Logger.class);
-        CsvExclusionFilterFactory.setLogger(mockLogger);
+        factory = new CsvExclusionFilterFactory(mockLogger);
 
         List<CsvExclusionEntry> entries = getEntriesFromFile("invalidExclusions.csv");
         assertThat(entries).isEmpty();
@@ -132,7 +132,7 @@ class CsvExclusionFilterFactoryTest {
     @Test
     void shouldAddEntriesWithTooManyFieldsCorrectly() throws URISyntaxException {
         Logger mockLogger = mock(Logger.class);
-        CsvExclusionFilterFactory.setLogger(mockLogger);
+        factory = new CsvExclusionFilterFactory(mockLogger);
 
         List<CsvExclusionEntry> entries = getEntriesFromFile("exclusionsWithTooManyFields.csv");
         assertThat(entries).isEmpty();
