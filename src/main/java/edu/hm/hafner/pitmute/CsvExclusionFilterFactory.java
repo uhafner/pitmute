@@ -1,5 +1,6 @@
 package edu.hm.hafner.pitmute;
 
+import edu.hm.hafner.util.VisibleForTesting;
 import org.pitest.mutationtest.build.InterceptorParameters;
 import org.pitest.mutationtest.build.MutationInterceptor;
 import org.pitest.mutationtest.build.MutationInterceptorFactory;
@@ -10,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -31,7 +33,25 @@ import java.util.logging.Logger;
 public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
     private static final String CSV_SEPARATOR = ",";
     private static final int MIN_FIELDS = 4;
-    private static final Logger LOGGER = Logger.getLogger(CsvExclusionFilterFactory.class.getName());
+    private final Logger logger;
+
+    /**
+     * Creates a {@code CsvExclusionFilterFactory} and initializes the logger.
+     */
+    public CsvExclusionFilterFactory() {
+        this.logger = Logger.getLogger(CsvExclusionFilterFactory.class.getName());
+    }
+
+    /**
+     * Constructor for testing purposes.
+     * Allows injection of a mock logger.
+     *
+     * @param logger the logger to use
+     */
+    @VisibleForTesting
+    CsvExclusionFilterFactory(final Logger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public MutationInterceptor createInterceptor(final InterceptorParameters params) {
@@ -54,31 +74,36 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
             int lineNumber = 0;
 
             for (String line : lines) {
+                if (line.isBlank() || line.trim().startsWith("#")) {
+                    continue;
+                }
+
                 String[] fields = line.split(CSV_SEPARATOR, -1);
+                if (fields.length > MIN_FIELDS) {
+                    logger.log(Level.WARNING, "Skipping invalid line {0}: it contains too many fields. "
+                            + "A line may contain a maximum of four fields (className, mutator (optional), "
+                            + "startLine (optional), endLine (optional)).", lineNumber);
+                    continue;
+                }
+                fields = Arrays.copyOf(fields, MIN_FIELDS);
 
                 lineNumber++;
-                if (fields.length >= MIN_FIELDS) {
-                    Optional<String> classNameOptional = normalize(fields[0]);
-                    if (classNameOptional.isEmpty()) {
-                        LOGGER.log(Level.WARNING, "Skipping line because class name is missing: {0}", lineNumber);
-                        continue;
-                    }
-
-                    try {
-                        entries.add(new CsvExclusionEntry(
-                                classNameOptional.get(),
-                                normalize(fields[1]),
-                                tryParseInteger(fields[2]),
-                                tryParseInteger(fields[3])
-                        ));
-                    }
-                    catch (IllegalArgumentException e) {
-                        LOGGER.log(Level.WARNING, "Skipping invalid line: {0}", lineNumber);
-                    }
+                Optional<String> classNameOptional = normalize(fields[0]);
+                if (classNameOptional.isEmpty()) {
+                    logger.log(Level.WARNING, "Skipping line because class name is missing: {0}", lineNumber);
+                    continue;
                 }
-                else {
-                    LOGGER.log(Level.WARNING, "Line should contain four fields (className, mutator (optional), "
-                            + "startLine (optional), endLine (optional)). Skipping invalid line: {0}", lineNumber);
+
+                try {
+                    entries.add(new CsvExclusionEntry(
+                            classNameOptional.get(),
+                            normalize(fields[1]),
+                            tryParseInteger(fields[2]),
+                            tryParseInteger(fields[3])
+                    ));
+                }
+                catch (IllegalArgumentException e) {
+                    logger.log(Level.WARNING, "Skipping invalid line: {0}", lineNumber);
                 }
             }
             return entries;

@@ -15,13 +15,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class CsvExclusionFilterFactoryTest {
-    private final CsvExclusionFilterFactory factory = new CsvExclusionFilterFactory();
+    private CsvExclusionFilterFactory factory = new CsvExclusionFilterFactory();
 
     @Test
     void shouldCreateCsvExclusionFilterWhenCsvPathIsProvidedAndExists() {
@@ -82,17 +83,61 @@ class CsvExclusionFilterFactoryTest {
 
     @Test
     void shouldNotAddEntriesWithoutClassName() throws URISyntaxException {
+        Logger mockLogger = mock(Logger.class);
+        factory = new CsvExclusionFilterFactory(mockLogger);
+
         List<CsvExclusionEntry> entries = getEntriesFromFile("ignoredButValidFormattedExclusions.csv");
         assertThat(entries).isEmpty();
+
+        verify(mockLogger, times(14)).log(eq(Level.WARNING), contains("class name is missing"), anyInt());
+    }
+
+    @Test
+    void shouldDoNothingForEmptyLinesAndComments() throws URISyntaxException {
+        Logger mockLogger = mock(Logger.class);
+        factory = new CsvExclusionFilterFactory(mockLogger);
+
+        List<CsvExclusionEntry> entries = getEntriesFromFile("ignoredLines.csv");
+        assertThat(entries).isEmpty();
+
+        verifyNoInteractions(mockLogger);
+    }
+
+    @Test
+    void shouldAddEntriesWithMissingTrailingFieldsCorrectly() throws URISyntaxException {
+        List<CsvExclusionEntry> entries = getEntriesFromFile("validWithMissingTrailingFields.csv");
+
+        assertThat(entries)
+                .hasSize(5)
+                .extracting(CsvExclusionEntry::className, CsvExclusionEntry::mutationName, CsvExclusionEntry::startLine, CsvExclusionEntry::endLine)
+                .containsExactly(
+                        tuple("Main", Optional.empty(), Optional.empty(), Optional.empty()),
+                        tuple("Main", Optional.empty(), Optional.empty(), Optional.empty()),
+                        tuple("Main", Optional.empty(), Optional.empty(), Optional.empty()),
+                        tuple("Main", Optional.of("Math"), Optional.empty(), Optional.empty()),
+                        tuple("Main", Optional.empty(), Optional.of(5), Optional.empty()));
     }
 
     @Test
     void shouldNotAddEntriesWhenExclusionsAreInvalid() throws URISyntaxException {
+        Logger mockLogger = mock(Logger.class);
+        factory = new CsvExclusionFilterFactory(mockLogger);
+
         List<CsvExclusionEntry> entries = getEntriesFromFile("invalidExclusions.csv");
         assertThat(entries).isEmpty();
 
-        entries = getEntriesFromFile("wrongFormattedExclusions.csv");
+        verify(mockLogger, times(3)).log(eq(Level.WARNING), contains("invalid line"), anyInt());
+    }
+
+    @Test
+    void shouldAddEntriesWithTooManyFieldsCorrectly() throws URISyntaxException {
+        Logger mockLogger = mock(Logger.class);
+        factory = new CsvExclusionFilterFactory(mockLogger);
+
+        List<CsvExclusionEntry> entries = getEntriesFromFile("exclusionsWithTooManyFields.csv");
         assertThat(entries).isEmpty();
+
+        verify(mockLogger, times(3)).log(eq(Level.WARNING), contains("maximum of four fields"), anyInt());
     }
 
     @Test
