@@ -46,7 +46,6 @@
   <properties>
     <scmTag>HEAD</scmTag>
     <module.name>edu.hm.hafner.pit.suppress</module.name>
-    <pitmute.version>0.1.0</pitmute.version>
   </properties>
 
   <dependencies>
@@ -124,7 +123,7 @@
             <dependency>
               <groupId>edu.hm.hafner</groupId>
               <artifactId>pitmute</artifactId>
-              <version>${pitmute.version}</version>
+              <version>0.1.0</version>
             </dependency>
           </dependencies>
         </plugin>
