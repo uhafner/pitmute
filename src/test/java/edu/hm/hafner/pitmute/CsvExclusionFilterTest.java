@@ -21,14 +21,6 @@ class CsvExclusionFilterTest {
     private static final String PRIMITIVE_RETURNS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator";
     private final Mutater mutater = mock(Mutater.class);
 
-    private MutationDetails createMutation(final String className, final String mutator, final int lineNumber) {
-        var mutation = mock(MutationDetails.class);
-        when(mutation.getClassName()).thenReturn(ClassName.fromString(className));
-        when(mutation.getMutator()).thenReturn(mutator);
-        when(mutation.getLineNumber()).thenReturn(lineNumber);
-        return mutation;
-    }
-
     @Test
     void shouldReturnCorrectType() {
         var csvExclusionFilter = new CsvExclusionFilter(List.of());
@@ -71,7 +63,7 @@ class CsvExclusionFilterTest {
         assertThat(filteredMutations).containsExactly(mutation2);
     }
 
-    @ParameterizedTest(name = "{index} => className: \"{0}\", mutationName: \"{1}\", startLine: \"{2}\", endLine: \"{3}\"")
+    @ParameterizedTest(name = "{index} => className: {0}, mutationName: {1}, startLine: {2}, endLine: {3}")
     @CsvSource(value = {
             "com.example.Main, null, null, null",
             "com.example.Main, org.pitest.mutationtest.engine.gregor.mutators.MathMutator, null, null",
@@ -94,7 +86,7 @@ class CsvExclusionFilterTest {
         assertThat(filteredMutations).isEmpty();
     }
 
-    @ParameterizedTest(name = "{index} => className: \"{0}\", mutationName: \"{1}\", startLine: \"{2}\", endLine: \"{3}\"")
+    @ParameterizedTest(name = "{index} => className: {0}, mutationName: {1}, startLine: {2}, endLine: {3}")
     @CsvSource(value = {
             "null, null, null, null",
             "com.example.Main, null, 6, null",
@@ -142,12 +134,12 @@ class CsvExclusionFilterTest {
         assertThat(filteredMutations).containsExactly(mutation);
     }
 
-    @ParameterizedTest(name = "{index} => className: \"{0}\"")
-    @CsvSource(value = {
+    @ParameterizedTest(name = "{index} => className: {0}")
+    @CsvSource({
             "com.example.Main",
             "Main.java",
             "Main"
-    }, nullValues = "null")
+    })
     void interceptShouldMatchClassNames(final String className) {
         var exclusionEntry = new CsvExclusionEntry(className, Optional.of("MathMutator"), Optional.empty(), Optional.empty());
         var csvExclusionFilter = new CsvExclusionFilter(List.of(exclusionEntry));
@@ -158,15 +150,15 @@ class CsvExclusionFilterTest {
         assertThat(filteredMutations).isEmpty();
     }
 
-    @ParameterizedTest(name = "{index} => className: \"{0}\"")
-    @CsvSource(value = {
+    @ParameterizedTest(name = "{index} => className: {0}")
+    @CsvSource({
             "com.example.Main.java",
             "src.main.java.com.example.Main",
             "OtherMain.java",
             "OtherMain",
             "MainClass",
             ".java"
-    }, nullValues = "null")
+    })
     void interceptShouldNotMatchWithInvalidClassNameFormats(final String className) {
         var exclusionEntry = new CsvExclusionEntry(className, Optional.of("MathMutator"), Optional.empty(), Optional.empty());
         var csvExclusionFilter = new CsvExclusionFilter(List.of(exclusionEntry));
@@ -175,5 +167,13 @@ class CsvExclusionFilterTest {
         Collection<MutationDetails> filteredMutations = csvExclusionFilter.intercept(List.of(mutation), mutater);
 
         assertThat(filteredMutations).containsExactly(mutation);
+    }
+
+    private MutationDetails createMutation(final String className, final String mutator, final int lineNumber) {
+        var mutation = mock(MutationDetails.class);
+        when(mutation.getClassName()).thenReturn(ClassName.fromString(className));
+        when(mutation.getMutator()).thenReturn(mutator);
+        when(mutation.getLineNumber()).thenReturn(lineNumber);
+        return mutation;
     }
 }
