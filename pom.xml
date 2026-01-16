@@ -117,6 +117,7 @@
           <configuration combine.children="append">
             <features>
               <feature>+FCSV(csvFile[etc/pitmute.csv])</feature>
+              <feature>+FANNOT</feature>
             </features>
           </configuration>
           <dependencies>
