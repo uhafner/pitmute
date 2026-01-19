@@ -23,7 +23,7 @@ class AnnotationExclusionFilterTest {
     private final AnnotationExclusionFilter filter = new AnnotationExclusionFilter();
     private final Mutater mutater = mock(Mutater.class);
     private static final String SUPPRESS_MUTATION_DESC = "Ledu/hm/hafner/pitmute/SuppressMutation;";
-    //private static final String SUPPRESS_MUTATIONS_DESC = "Ledu/hm/hafner/pitmute/SuppressMutations;";
+    private static final String SUPPRESS_MUTATIONS_DESC = "Ledu/hm/hafner/pitmute/SuppressMutations;";
     private static final String MATH_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.MathMutator";
     private static final String PRIMITIVE_RETURNS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator";
     private static final String NEGATE_CONDITIONALS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator";
@@ -32,7 +32,7 @@ class AnnotationExclusionFilterTest {
     void shouldOnlySuppressMutationIfClassHasAnnotationWithMatchingMutatorValue() {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
 
-        var annotations = createAnnotations(List.of(List.of("mutator", "Math")));
+        var annotations = List.of(createAnnotation(List.of("mutator", "Math")));
         when(classTree.annotations()).thenReturn(annotations);
         when(classTree.methods()).thenReturn(List.of());
 
@@ -51,7 +51,7 @@ class AnnotationExclusionFilterTest {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
         ClassTree anotherClassTree = createClassTree("com.example.otherPath.TestClass");
 
-        var annotations = createAnnotations(List.of(List.of("mutator", "Math")));
+        var annotations = List.of(createAnnotation(List.of("mutator", "Math")));
         when(classTree.annotations()).thenReturn(annotations);
         when(classTree.methods()).thenReturn(List.of());
 
@@ -71,7 +71,7 @@ class AnnotationExclusionFilterTest {
     @Test
     void shouldSuppressAllMutationsWhenClassHasAnnotationWithoutValues() {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
-        var annotations = createAnnotations(List.of());
+        var annotations = List.of(createAnnotation(List.of()));
         when(classTree.annotations()).thenReturn(annotations);
         MethodTree anyMethod = createMethodTree(classTree, "anyMethod");
         MethodTree anyOtherMethod = createMethodTree(classTree, "anyOtherMethod");
@@ -98,7 +98,7 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = createAnnotations(List.of());
+        var annotations = List.of(createAnnotation(List.of()));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
@@ -114,7 +114,7 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = createAnnotations(List.of(List.of("mutator", "Math")));
+        var annotations = List.of(createAnnotation(List.of("mutator", "Math")));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
@@ -131,7 +131,7 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = createAnnotations(List.of(List.of("mutator", "Math"), List.of("mutator", "PrimitiveReturns")));
+        var annotations = List.of(createContainerAnnotation(List.of(List.of("mutator", "Math"), List.of("mutator", "PrimitiveReturns"))));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
@@ -148,7 +148,7 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = createAnnotations(List.of(List.of("mutator", "Math")));
+        var annotations = List.of(createAnnotation(List.of("mutator", "Math")));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
@@ -161,11 +161,11 @@ class AnnotationExclusionFilterTest {
     @Test
     void shouldSuppressMutationsWithClassAndMethodLevelAnnotations() {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
-        var classAnnotations = createAnnotations(List.of(List.of("mutator", "Math")));
+        var classAnnotations = List.of(createAnnotation(List.of("mutator", "Math")));
         when(classTree.annotations()).thenReturn(classAnnotations);
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = createAnnotations(List.of(List.of("mutator", "Math"), List.of("mutator", "PrimitiveReturns"), List.of("mutator", "NegateConditionals")));
+        var annotations = List.of(createContainerAnnotation(List.of(List.of("mutator", "Math"), List.of("mutator", "PrimitiveReturns"), List.of("mutator", "NegateConditionals"))));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
@@ -201,20 +201,24 @@ class AnnotationExclusionFilterTest {
         return methodTree;
     }
 
-    private static List<AnnotationNode> createAnnotations(final List<List<Object>> values) {
-        if (values.isEmpty()) {
-            return List.of(new AnnotationNode(SUPPRESS_MUTATION_DESC));
-        }
+    private AnnotationNode createAnnotation(List<Object> values) {
+        AnnotationNode annotation = new AnnotationNode(SUPPRESS_MUTATION_DESC);
+        annotation.values = values;
+        return annotation;
+    }
 
-//        String desc = values.size() > 1 ? SUPPRESS_MUTATIONS_DESC : SUPPRESS_MUTATION_DESC;
-        List<AnnotationNode> annotationNodes = new ArrayList<>();
+    private AnnotationNode createContainerAnnotation(List<List<Object>> values) {
+        AnnotationNode container = new AnnotationNode(SUPPRESS_MUTATIONS_DESC);
+        container.values = new ArrayList<>();
+        container.values.add("value");
+
+        List<AnnotationNode> annotations = new ArrayList<>();
         for (List<Object> value : values) {
-            var annotation = new AnnotationNode(SUPPRESS_MUTATION_DESC);
-            annotation.values = value;
-            annotationNodes.add(annotation);
+            annotations.add(createAnnotation(value));
         }
 
-        return annotationNodes;
+        container.values.add(annotations);
+        return container;
     }
 
     private MutationDetails createMutation(final String className, final String methodName, final String mutatorFqcn) {
