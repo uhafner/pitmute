@@ -19,16 +19,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class AnnotationExclusionFilterTest {
+    public static final String TEST_CLASS_FQCN = "com.example.TestClass";
     private final AnnotationExclusionFilter filter = new AnnotationExclusionFilter();
     private final Mutater mutater = mock(Mutater.class);
     private static final String SUPPRESS_MUTATION_DESC = "Ledu/hm/hafner/pitmute/SuppressMutation;";
+    //private static final String SUPPRESS_MUTATIONS_DESC = "Ledu/hm/hafner/pitmute/SuppressMutations;";
     private static final String MATH_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.MathMutator";
     private static final String PRIMITIVE_RETURNS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator";
     private static final String NEGATE_CONDITIONALS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator";
 
     @Test
     void shouldOnlySuppressMutationIfClassHasAnnotationWithMatchingMutatorValue() {
-        ClassTree classTree = createClassTree("com.example.TestClass");
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
 
         var annotations = createAnnotations(List.of(List.of("mutator", "Math")));
         when(classTree.annotations()).thenReturn(annotations);
@@ -36,8 +38,8 @@ class AnnotationExclusionFilterTest {
 
         filter.begin(classTree);
 
-        MutationDetails matchingMutation = createMutation("com.example.TestClass", "anyMethod", MATH_MUTATOR_FQCN);
-        MutationDetails notMatchingMutation = createMutation("com.example.TestClass", "anyMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
+        MutationDetails matchingMutation = createMutation(TEST_CLASS_FQCN, "anyMethod", MATH_MUTATOR_FQCN);
+        MutationDetails notMatchingMutation = createMutation(TEST_CLASS_FQCN, "anyMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
 
         Collection<MutationDetails> remainingMutations = filter.intercept(List.of(matchingMutation, notMatchingMutation), mutater);
 
@@ -46,24 +48,29 @@ class AnnotationExclusionFilterTest {
 
     @Test
     void shouldNotSuppressMutationsInSameNamedClassInDifferentPackage() {
-        ClassTree classTree = createClassTree("com.example.TestClass");
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
+        ClassTree anotherClassTree = createClassTree("com.example.otherPath.TestClass");
 
         var annotations = createAnnotations(List.of(List.of("mutator", "Math")));
         when(classTree.annotations()).thenReturn(annotations);
         when(classTree.methods()).thenReturn(List.of());
 
+        when(anotherClassTree.annotations()).thenReturn(List.of());
+        when(anotherClassTree.methods()).thenReturn(List.of());
+
         filter.begin(classTree);
+        filter.begin(anotherClassTree);
 
-        MutationDetails mutationMathMutator = createMutation("com.example.otherPath.TestClass", "anyMethod", MATH_MUTATOR_FQCN);
+        MutationDetails mathMutation = createMutation("com.example.otherPath.TestClass", "anyMethod", MATH_MUTATOR_FQCN);
 
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mutationMathMutator), mutater);
+        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation), mutater);
 
-        assertThat(remainingMutations).containsExactly(mutationMathMutator);
+        assertThat(remainingMutations).containsExactly(mathMutation);
     }
 
     @Test
     void shouldSuppressAllMutationsWhenClassHasAnnotationWithoutValues() {
-        ClassTree classTree = createClassTree("com.example.TestClass");
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
         var annotations = createAnnotations(List.of());
         when(classTree.annotations()).thenReturn(annotations);
         MethodTree anyMethod = createMethodTree(classTree, "anyMethod");
@@ -72,8 +79,8 @@ class AnnotationExclusionFilterTest {
 
         filter.begin(classTree);
 
-        MutationDetails mutation = createMutation("com.example.TestClass", "anyMethod", "AnyMutator");
-        MutationDetails otherMutation = createMutation("com.example.TestClass", "anyOtherMethod", "AnyOtherMutator");
+        MutationDetails mutation = createMutation(TEST_CLASS_FQCN, "anyMethod", "AnyMutator");
+        MutationDetails otherMutation = createMutation(TEST_CLASS_FQCN, "anyOtherMethod", "AnyOtherMutator");
 
         Collection<MutationDetails> remainingMutations = filter.intercept(List.of(), mutater);
         assertThat(remainingMutations).isEmpty();
@@ -87,7 +94,7 @@ class AnnotationExclusionFilterTest {
 
     @Test
     void shouldSuppressAllMutationsInMethodWhenMethodHasAnnotationWithoutValues() {
-        ClassTree classTree = createClassTree("com.example.TestClass");
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
@@ -95,7 +102,7 @@ class AnnotationExclusionFilterTest {
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
-        MutationDetails mutation = createMutation("com.example.TestClass", "annotatedMethod", MATH_MUTATOR_FQCN);
+        MutationDetails mutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN);
         Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mutation), mutater);
 
         assertThat(remainingMutations).isEmpty();
@@ -103,7 +110,7 @@ class AnnotationExclusionFilterTest {
 
     @Test
     void shouldSuppressMutationInMethodWhenMethodHasAnnotationWithMatchingMutator() {
-        ClassTree classTree = createClassTree("com.example.TestClass");
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
@@ -111,33 +118,33 @@ class AnnotationExclusionFilterTest {
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
-        MutationDetails matchingMutation = createMutation("com.example.TestClass", "annotatedMethod", MATH_MUTATOR_FQCN);
-        MutationDetails notMatchingMutation = createMutation("com.example.TestClass", "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
+        MutationDetails matchingMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN);
+        MutationDetails notMatchingMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
         Collection<MutationDetails> remainingMutations = filter.intercept(List.of(matchingMutation, notMatchingMutation), mutater);
 
         assertThat(remainingMutations).containsExactly(notMatchingMutation);
     }
 
     @Test
-    void shouldSuppressMutationInMethodCorrectlyForMethodWithMultipleAnnotations() {
-        ClassTree classTree = createClassTree("com.example.TestClass");
+    void shouldSuppressMutationsInMethodCorrectlyForMethodWithMultipleAnnotations() {
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = createAnnotations(List.of(List.of("mutator", "Math"),  List.of("mutator", "PrimitiveReturns")));
+        var annotations = createAnnotations(List.of(List.of("mutator", "Math"), List.of("mutator", "PrimitiveReturns")));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
-        MutationDetails mutationMathMutator = createMutation("com.example.TestClass", "annotatedMethod", MATH_MUTATOR_FQCN);
-        MutationDetails mutationPrimitiveReturnsMutator = createMutation("com.example.TestClass", "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mutationMathMutator, mutationPrimitiveReturnsMutator), mutater);
+        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN);
+        MutationDetails primitiveReturnsMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
+        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, primitiveReturnsMutation), mutater);
 
         assertThat(remainingMutations).isEmpty();
     }
 
     @Test
     void shouldNotSuppressMutationFromOtherNotAnnotatedMethodWhenMutatorIsMatching() {
-        ClassTree classTree = createClassTree("com.example.TestClass");
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
@@ -145,7 +152,7 @@ class AnnotationExclusionFilterTest {
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
-        MutationDetails mutationInOtherMethod = createMutation("com.example.TestClass", "otherMethod", MATH_MUTATOR_FQCN);
+        MutationDetails mutationInOtherMethod = createMutation(TEST_CLASS_FQCN, "otherMethod", MATH_MUTATOR_FQCN);
         Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mutationInOtherMethod), mutater);
 
         assertThat(remainingMutations).containsExactly(mutationInOtherMethod);
@@ -153,7 +160,7 @@ class AnnotationExclusionFilterTest {
 
     @Test
     void shouldSuppressMutationsWithClassAndMethodLevelAnnotations() {
-        ClassTree classTree = createClassTree("com.example.TestClass");
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
         var classAnnotations = createAnnotations(List.of(List.of("mutator", "Math")));
         when(classTree.annotations()).thenReturn(classAnnotations);
 
@@ -162,15 +169,15 @@ class AnnotationExclusionFilterTest {
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
-        MutationDetails mutationMathMutator = createMutation("com.example.TestClass", "annotatedMethod", MATH_MUTATOR_FQCN);
-        MutationDetails mutationPrimitiveReturnsMutator = createMutation("com.example.TestClass", "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
-        MutationDetails mutationNegateConditionalsMutator = createMutation("com.example.TestClass", "otherMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN);
-        MutationDetails mutationMathMutatorInOtherMethod = createMutation("com.example.TestClass", "otherMethod", MATH_MUTATOR_FQCN);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mutationMathMutator, mutationPrimitiveReturnsMutator, mutationNegateConditionalsMutator, mutationMathMutatorInOtherMethod), mutater);
+        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN);
+        MutationDetails primitiveReturnsMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
+        MutationDetails negateConditionalsMutation = createMutation(TEST_CLASS_FQCN, "otherMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN);
+        MutationDetails mathMutationInOtherMethod = createMutation(TEST_CLASS_FQCN, "otherMethod", MATH_MUTATOR_FQCN);
+        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, primitiveReturnsMutation, negateConditionalsMutation, mathMutationInOtherMethod), mutater);
 
-        assertThat(remainingMutations).containsExactly(mutationNegateConditionalsMutator);
+        assertThat(remainingMutations).containsExactly(negateConditionalsMutation);
     }
-    
+
     @Test
     void shouldReturnCorrectType() {
         assertThat(filter.type()).isEqualTo(InterceptorType.FILTER);
@@ -199,10 +206,10 @@ class AnnotationExclusionFilterTest {
             return List.of(new AnnotationNode(SUPPRESS_MUTATION_DESC));
         }
 
+//        String desc = values.size() > 1 ? SUPPRESS_MUTATIONS_DESC : SUPPRESS_MUTATION_DESC;
         List<AnnotationNode> annotationNodes = new ArrayList<>();
         for (List<Object> value : values) {
             var annotation = new AnnotationNode(SUPPRESS_MUTATION_DESC);
-
             annotation.values = value;
             annotationNodes.add(annotation);
         }
