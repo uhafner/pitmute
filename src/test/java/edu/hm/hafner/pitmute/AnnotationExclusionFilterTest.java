@@ -201,13 +201,13 @@ class AnnotationExclusionFilterTest {
         return methodTree;
     }
 
-    private AnnotationNode createAnnotation(List<Object> values) {
+    private AnnotationNode createAnnotation(final List<Object> values) {
         AnnotationNode annotation = new AnnotationNode(SUPPRESS_MUTATION_DESC);
         annotation.values = values;
         return annotation;
     }
 
-    private AnnotationNode createContainerAnnotation(List<List<Object>> values) {
+    private AnnotationNode createContainerAnnotation(final List<List<Object>> values) {
         AnnotationNode container = new AnnotationNode(SUPPRESS_MUTATIONS_DESC);
         container.values = new ArrayList<>();
         container.values.add("value");

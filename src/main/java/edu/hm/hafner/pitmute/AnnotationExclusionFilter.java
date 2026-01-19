@@ -53,7 +53,7 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
             }
             else if (SUPPRESS_MUTATIONS_DESC.equals(annotation.desc)) {
                 List<AnnotationNode> repeatedAnnotations = getRepeatedAnnotations(annotation);
-                for(AnnotationNode singleAnnotation : repeatedAnnotations) {
+                for (AnnotationNode singleAnnotation : repeatedAnnotations) {
                     addRules(suppressionRules, className, methodName, singleAnnotation);
                 }
             }
@@ -63,12 +63,12 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
     private List<AnnotationNode> getRepeatedAnnotations(final AnnotationNode containerAnnotation) {
         List<AnnotationNode> annotations = new ArrayList<>();
 
-        for (int i = 0; i < containerAnnotation.values.size(); i += 2) {
+        for (int i = 0; i < containerAnnotation.values.size() - 1; i += 2) {
             String annotationName = containerAnnotation.values.get(i).toString();
             Object value = containerAnnotation.values.get(i + 1);
 
             if ("value".equals(annotationName) && value instanceof List) {
-                annotations.addAll((List<AnnotationNode>) value);
+                return (List<AnnotationNode>) value;
             }
         }
         return annotations;
