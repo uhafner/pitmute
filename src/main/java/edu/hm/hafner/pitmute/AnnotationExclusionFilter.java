@@ -67,8 +67,11 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
             String annotationName = containerAnnotation.values.get(i).toString();
             Object value = containerAnnotation.values.get(i + 1);
 
-            if ("value".equals(annotationName) && value instanceof List) {
-                return (List<AnnotationNode>) value;
+            if ("value".equals(annotationName) && value instanceof List<?> list) {
+                return list.stream()
+                        .filter(AnnotationNode.class::isInstance)
+                        .map(AnnotationNode.class::cast)
+                        .collect(Collectors.toList());
             }
         }
         return annotations;
