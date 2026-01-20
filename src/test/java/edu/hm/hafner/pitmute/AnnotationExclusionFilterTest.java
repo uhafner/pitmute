@@ -179,6 +179,33 @@ class AnnotationExclusionFilterTest {
     }
 
     @Test
+    void shouldNotSuppressMutationsForAnnotationsWithOddValuesSize() {
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
+        var classAnnotations = List.of(createAnnotation(List.of("mutator")));
+        when(classTree.annotations()).thenReturn(classAnnotations);
+
+        var annotations = List.of(createAnnotation(List.of("mutator")));
+        MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
+        when(methodTree.annotations()).thenReturn(annotations);
+
+        MethodTree methodTreeWithInvalidContainer = createMethodTree(classTree, "methodWithInvalidContainer");
+        var invalidContainerAnnotation = List.of(createContainerAnnotation(
+                List.of(List.of("mutator"), List.of("mutator", "NegateConditionals", "mutator"),
+                List.of("mutator", "NegateConditionals", "mutator", "NegateConditionals", "mutator"))));
+        when(methodTreeWithInvalidContainer.annotations()).thenReturn(invalidContainerAnnotation);
+        when(classTree.methods()).thenReturn(List.of(methodTree, methodTreeWithInvalidContainer));
+
+        filter.begin(classTree);
+        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN);
+        MutationDetails primitiveReturnsMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
+        MutationDetails negateConditionalsMutation = createMutation(TEST_CLASS_FQCN, "methodWithInvalidContainer", NEGATE_CONDITIONALS_MUTATOR_FQCN);
+        MutationDetails otherMathMutation = createMutation(TEST_CLASS_FQCN, "methodWithInvalidContainer", MATH_MUTATOR_FQCN);
+        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, primitiveReturnsMutation, negateConditionalsMutation, otherMathMutation), mutater);
+
+        assertThat(remainingMutations).containsExactly(mathMutation, primitiveReturnsMutation, otherMathMutation);
+    }
+
+    @Test
     void shouldReturnCorrectType() {
         assertThat(filter.type()).isEqualTo(InterceptorType.FILTER);
     }
@@ -202,13 +229,13 @@ class AnnotationExclusionFilterTest {
     }
 
     private AnnotationNode createAnnotation(final List<Object> values) {
-        AnnotationNode annotation = new AnnotationNode(SUPPRESS_MUTATION_DESC);
+        var annotation = new AnnotationNode(SUPPRESS_MUTATION_DESC);
         annotation.values = values;
         return annotation;
     }
 
     private AnnotationNode createContainerAnnotation(final List<List<Object>> values) {
-        AnnotationNode container = new AnnotationNode(SUPPRESS_MUTATIONS_DESC);
+        var container = new AnnotationNode(SUPPRESS_MUTATIONS_DESC);
         container.values = new ArrayList<>();
         container.values.add("value");
 

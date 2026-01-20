@@ -52,7 +52,7 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
                 addRules(suppressionRules, className, methodName, annotation);
             }
             else if (SUPPRESS_MUTATIONS_DESC.equals(annotation.desc)) {
-                List<AnnotationNode> repeatedAnnotations = getRepeatedAnnotations(annotation);
+                List<AnnotationNode> repeatedAnnotations = getAnnotationsFromContainer(annotation);
                 for (AnnotationNode singleAnnotation : repeatedAnnotations) {
                     addRules(suppressionRules, className, methodName, singleAnnotation);
                 }
@@ -60,7 +60,7 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         }
     }
 
-    private List<AnnotationNode> getRepeatedAnnotations(final AnnotationNode containerAnnotation) {
+    private List<AnnotationNode> getAnnotationsFromContainer(final AnnotationNode containerAnnotation) {
         List<AnnotationNode> annotations = new ArrayList<>();
 
         for (int i = 0; i < containerAnnotation.values.size() - 1; i += 2) {
@@ -82,7 +82,7 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         }
 
         String elementNameMutator = "mutator";
-        for (int i = 0; i < values.size(); i += 2) {
+        for (int i = 0; i < values.size() - 1; i += 2) {
             String annotationElement = values.get(i).toString();
             Object value = values.get(i + 1);
             if (annotationElement.equals(elementNameMutator)) {
@@ -109,6 +109,7 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         return false;
     }
 
+    @SuppressMutation(mutator = "BooleanFalseReturnVals")
     private static boolean mutatorMatches(final String fqcn, final String mutatorNameEntry) {
         if (mutatorNameEntry == null || mutatorNameEntry.isBlank()) {
             return true;
