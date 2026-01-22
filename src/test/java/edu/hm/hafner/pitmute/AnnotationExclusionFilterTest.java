@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class AnnotationExclusionFilterTest {
@@ -182,27 +182,20 @@ class AnnotationExclusionFilterTest {
     @Test
     void shouldNotSuppressMutationsForInvalidAnnotationsWithOddValuesSize() {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
-        var classAnnotations = List.of(createAnnotation(List.of("mutator")));
-        when(classTree.annotations()).thenReturn(classAnnotations);
-
-        var invalidAnnotations = List.of(createAnnotation(List.of("mutator")));
-        MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        when(methodTree.annotations()).thenReturn(invalidAnnotations);
+        when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTreeWithInvalidContainer = createMethodTree(classTree, "methodWithInvalidContainer");
-        var invalidContainerAnnotation = List.of(createContainerAnnotation(
-                List.of(List.of("mutator"), List.of("mutator", "NegateConditionals", "line"))));
+        var invalidContainerAnnotation = List.of(createContainerAnnotation(List.of(List.of("mutator"))));
         when(methodTreeWithInvalidContainer.annotations()).thenReturn(invalidContainerAnnotation);
-        when(classTree.methods()).thenReturn(List.of(methodTree, methodTreeWithInvalidContainer));
 
-        filter.begin(classTree);
-        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN, FIRST_LINE);
-        MutationDetails primitiveReturnsMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN, FIRST_LINE);
-        MutationDetails negateConditionalsMutation = createMutation(TEST_CLASS_FQCN, "methodWithInvalidContainer", NEGATE_CONDITIONALS_MUTATOR_FQCN, FIRST_LINE);
-        MutationDetails otherMathMutation = createMutation(TEST_CLASS_FQCN, "methodWithInvalidContainer", MATH_MUTATOR_FQCN, FIRST_LINE);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, primitiveReturnsMutation, negateConditionalsMutation, otherMathMutation), mutater);
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(()-> filter.begin(classTree))
+                .withMessageContaining("Invalid annotation");
 
-        assertThat(remainingMutations).containsExactly(mathMutation, primitiveReturnsMutation, negateConditionalsMutation, otherMathMutation);
+        invalidContainerAnnotation = List.of(createContainerAnnotation(List.of(List.of("mutator", "NegateConditionals", "line"))));
+        when(methodTreeWithInvalidContainer.annotations()).thenReturn(invalidContainerAnnotation);
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(()-> filter.begin(classTree))
+                .withMessageContaining("Invalid annotation");
     }
 
     @Test
