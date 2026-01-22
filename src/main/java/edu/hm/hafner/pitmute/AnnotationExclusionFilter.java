@@ -80,18 +80,28 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
     private static void addRules(final List<SuppressionRule> suppressionRules, final String className, final Optional<String> methodName, final AnnotationNode annotation) {
         List<Object> values = annotation.values;
         if (values == null || values.isEmpty()) {
-            suppressionRules.add(new SuppressionRule(className, methodName, Optional.empty()));
+            suppressionRules.add(new SuppressionRule(className, methodName, Optional.empty(), Optional.empty()));
             return;
+        }
+        else if (values.size() % 2 == 1) {
+            return; // size should never be odd
         }
 
         String elementNameMutator = "mutator";
+        String elementNameLine = "line";
+        Optional<String> mutatorName = Optional.empty();
+        Optional<Integer> line = Optional.empty();
         for (int i = 0; i < values.size() - 1; i += 2) {
             String annotationElement = values.get(i).toString();
             Object value = values.get(i + 1);
             if (annotationElement.equals(elementNameMutator)) {
-                suppressionRules.add(new SuppressionRule(className, methodName, Optional.of(value.toString())));
+                mutatorName = Optional.of(value.toString());
+            }
+            else if (annotationElement.equals(elementNameLine)) {
+                line = Optional.of(Integer.parseInt(value.toString()));
             }
         }
+        suppressionRules.add(new SuppressionRule(className, methodName, mutatorName, line));
     }
 
     @Override
@@ -104,8 +114,10 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         List<SuppressionRule> rulesDefinedInClass = suppressionByClass.getOrDefault(className, List.of());
 
         for (SuppressionRule rule : rulesDefinedInClass) {
-            if ((rule.methodName().isEmpty() || rule.methodName().get().equals(mutation.getMethod()))
-                    && (rule.mutatorName().isEmpty() || mutatorMatches(mutation.getMutator(), rule.mutatorName().get()))) {
+            boolean methodNameMatches = rule.methodName().isEmpty() || rule.methodName().get().equals(mutation.getMethod());
+            boolean mutatorNameMatches = rule.mutatorName().isEmpty() || mutatorMatches(mutation.getMutator(), rule.mutatorName().get());
+            boolean lineMatches = rule.line().isEmpty() || rule.line().get() == mutation.getLineNumber();
+            if (methodNameMatches && mutatorNameMatches && lineMatches) {
                 return true;
             }
         }
