@@ -37,8 +37,8 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         extractSuppressionRules(classTree.annotations(), suppressionRules, className, Optional.empty());
 
         for (MethodTree method : classTree.methods()) {
-            String methodName = method.asLocation().getMethodName();
-            extractSuppressionRules(method.annotations(), suppressionRules, className, Optional.of(methodName));
+            String methodNameWithDesc = method.asLocation().getMethodName() + method.asLocation().getMethodDesc();
+            extractSuppressionRules(method.annotations(), suppressionRules, className, Optional.of(methodNameWithDesc));
         }
     }
 
@@ -112,7 +112,8 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         List<SuppressionRule> rulesDefinedInClass = suppressionByClass.getOrDefault(className, List.of());
 
         for (SuppressionRule rule : rulesDefinedInClass) {
-            boolean methodNameMatches = rule.methodName().isEmpty() || rule.methodName().get().equals(mutation.getMethod());
+            String methodNameWithDesc = mutation.getMethod() + mutation.getId().getLocation().getMethodDesc();
+            boolean methodNameMatches = rule.methodName().isEmpty() || rule.methodName().get().equals(methodNameWithDesc);
             boolean mutatorNameMatches = rule.mutatorName().isEmpty() || mutatorMatches(mutation.getMutator(), rule.mutatorName().get());
             boolean lineMatches = rule.line().isEmpty() || rule.line().get() == mutation.getLineNumber();
             if (methodNameMatches && mutatorNameMatches && lineMatches) {
