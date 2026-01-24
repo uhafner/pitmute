@@ -81,8 +81,9 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
             suppressionRules.add(new SuppressionRule(className, methodName, Optional.empty(), Optional.empty()));
             return;
         }
-        else if (values.size() % 2 == 1) {
-            throw new IllegalStateException("Invalid annotation parameters: " + values);
+
+        if (values.size() % 2 == 1) {
+            throw new IllegalStateException("Invalid ASM AnnotationNode: expected key-value pairs in 'values' list, but found odd size: " + values);
         }
 
         String elementNameMutator = "mutator";
