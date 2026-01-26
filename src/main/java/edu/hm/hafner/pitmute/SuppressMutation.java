@@ -1,9 +1,6 @@
 package edu.hm.hafner.pitmute;
 
-import java.lang.annotation.Repeatable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
+import java.lang.annotation.*;
 
 /**
  * Suppresses specific mutations when the feature defined in {@link AnnotationExclusionFilterFactory} is enabled.
@@ -12,6 +9,7 @@ import java.lang.annotation.RetentionPolicy;
  * This annotation can be applied to classes or methods. When used without parameters all mutations in that scope are suppressed.
  * </p>
  */
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(SuppressMutations.class)
 public @interface SuppressMutation {
