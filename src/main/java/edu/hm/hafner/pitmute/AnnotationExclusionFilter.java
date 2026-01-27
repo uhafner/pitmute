@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Filters generated PIT mutations by inspecting bytecode for {@link SuppressMutation} annotations on classes and methods.
  *
  * <p>
- * Mutations are excluded based on the presence of an annotation and its optional parameter.
+ * Mutations are excluded based on the presence of an annotation and its optional parameters.
  * For more information, please see the README.
  * </p>
  */
@@ -78,7 +78,7 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
     private static void addSuppressionRuleForAnnotation(final AnnotationNode annotation, final List<SuppressionRule> suppressionRules, final String className, final Optional<String> methodName) {
         List<Object> values = annotation.values;
         if (values == null || values.isEmpty()) {
-            suppressionRules.add(new SuppressionRule(className, methodName, Optional.empty(), Optional.empty()));
+            suppressionRules.add(new SuppressionRule(className, methodName, PitMutator.NONE, Optional.empty(), Optional.empty()));
             return;
         }
 
@@ -86,21 +86,18 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
             throw new IllegalStateException("Invalid ASM AnnotationNode: expected key-value pairs in 'values' list, but found odd size: " + values);
         }
 
-        String elementNameMutator = "mutator";
-        String elementNameLine = "line";
-        Optional<String> mutatorName = Optional.empty();
-        Optional<Integer> line = Optional.empty();
+        Map<String, Object> elements = new HashMap<>();
         for (int i = 0; i < values.size() - 1; i += 2) {
-            String annotationElement = values.get(i).toString();
-            Object value = values.get(i + 1);
-            if (annotationElement.equals(elementNameMutator)) {
-                mutatorName = Optional.of(value.toString());
-            }
-            else if (annotationElement.equals(elementNameLine)) {
-                line = Optional.of(Integer.parseInt(value.toString()));
-            }
+            elements.put(values.get(i).toString(), values.get(i + 1));
         }
-        suppressionRules.add(new SuppressionRule(className, methodName, mutatorName, line));
+
+        Optional<String> mutatorName = Optional.ofNullable(elements.get("mutatorName")).map(Object::toString);
+        Optional<Integer> line = Optional.ofNullable(elements.get("line")).map(Object::toString).map(Integer::parseInt);
+        PitMutator mutator = Optional.ofNullable((String[]) elements.get("mutator"))
+                .map(enumData -> PitMutator.valueOf(enumData[1]))
+                .orElse(PitMutator.NONE);
+
+        suppressionRules.add(new SuppressionRule(className, methodName, mutator, mutatorName, line));
     }
 
     @Override
@@ -115,7 +112,8 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         for (SuppressionRule rule : rulesDefinedInClass) {
             String methodNameWithDesc = mutation.getMethod() + mutation.getId().getLocation().getMethodDesc();
             boolean methodNameMatches = rule.methodName().isEmpty() || rule.methodName().get().equals(methodNameWithDesc);
-            boolean mutatorNameMatches = rule.mutatorName().isEmpty() || mutatorMatches(mutation.getMutator(), rule.mutatorName().get());
+            boolean mutatorNameMatches = mutation.getMutator().equals(rule.mutator().getFqcn())
+                    || rule.mutatorName().isEmpty() || mutatorNameMatches(mutation.getMutator(), rule.mutatorName().get());
             boolean lineMatches = rule.line().isEmpty() || rule.line().get() == mutation.getLineNumber();
             if (methodNameMatches && mutatorNameMatches && lineMatches) {
                 return true;
@@ -124,7 +122,7 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         return false;
     }
 
-    private static boolean mutatorMatches(final String fqcn, final String mutatorNameEntry) {
+    private static boolean mutatorNameMatches(final String fqcn, final String mutatorNameEntry) {
         String mutatorName = fqcn.substring(fqcn.lastIndexOf('.') + 1);
         String shortMutatorName = mutatorName.endsWith("Mutator") ? mutatorName.substring(0, mutatorName.length() - 7) : mutatorName;
         return fqcn.equals(mutatorNameEntry) || mutatorName.equals(mutatorNameEntry) || shortMutatorName.equals(mutatorNameEntry);
