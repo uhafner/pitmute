@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.pitest.bytecode.analysis.ClassTree;
 import org.pitest.bytecode.analysis.MethodTree;
@@ -40,11 +41,12 @@ class AnnotationExclusionFilterTest {
     public static final String THREE_INT_TO_INT_DESC = "(III)I";
     public static final String EMPTY_TO_VOID_DESC = "()V";
 
-    @Test
-    void shouldOnlySuppressMutationIfClassHasAnnotationWithMatchingMutatorName() {
+    @ParameterizedTest(name = "{index} => mutatorName: {0}")
+    @ValueSource(strings = {"Math", "MathMutator", MATH_MUTATOR_FQCN})
+    void shouldOnlySuppressMutationIfClassHasAnnotationWithMatchingMutatorName(final String strings) {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
 
-        var annotations = List.of(createAnnotation(MUTATOR_NAME, "Math"));
+        var annotations = List.of(createAnnotation(MUTATOR_NAME, strings));
         when(classTree.annotations()).thenReturn(annotations);
         when(classTree.methods()).thenReturn(List.of());
 
@@ -317,7 +319,7 @@ class AnnotationExclusionFilterTest {
 
         String[] matchMutator = {PIT_MUTATOR_FQCN, String.valueOf(PitMutator.MATH)};
         String[] otherMutator = {PIT_MUTATOR_FQCN, String.valueOf(PitMutator.PRIMITIVE_RETURNS)};
-        String matchName = "Math";
+        String matchName = MATH_MUTATOR_FQCN;
         String otherName = "PrimitiveReturns";
 
         return Stream.of(
