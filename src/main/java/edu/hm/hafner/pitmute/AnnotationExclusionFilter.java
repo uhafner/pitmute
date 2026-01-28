@@ -93,9 +93,12 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
 
         Optional<String> mutatorName = Optional.ofNullable(elements.get("mutatorName")).map(Object::toString);
         Optional<Integer> line = Optional.ofNullable(elements.get("line")).map(Object::toString).map(Integer::parseInt);
-        PitMutator mutator = Optional.ofNullable((String[]) elements.get("mutator"))
-                .map(enumData -> PitMutator.valueOf(enumData[1]))
-                .orElse(PitMutator.NONE);
+        PitMutator mutator = PitMutator.NONE;
+        String[] mutatorData = (String[]) elements.get("mutator");
+        if (mutatorData != null && mutatorData.length > 1) {
+            String enumString = mutatorData[1];
+            mutator = PitMutator.valueOf(enumString);
+        }
 
         suppressionRules.add(new SuppressionRule(className, methodName, mutator, mutatorName, line));
     }
@@ -112,10 +115,11 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         for (SuppressionRule rule : rulesDefinedInClass) {
             String methodNameWithDesc = mutation.getMethod() + mutation.getId().getLocation().getMethodDesc();
             boolean methodNameMatches = rule.methodName().isEmpty() || rule.methodName().get().equals(methodNameWithDesc);
-            boolean mutatorNameMatches = mutation.getMutator().equals(rule.mutator().getFqcn())
-                    || rule.mutatorName().isEmpty() || mutatorNameMatches(mutation.getMutator(), rule.mutatorName().get());
+            boolean mutatorMatches = mutation.getMutator().equals(rule.mutator().getFqcn());
+            boolean mutatorNameMatches = rule.mutatorName().isEmpty() || mutatorNameMatches(mutation.getMutator(), rule.mutatorName().get());
             boolean lineMatches = rule.line().isEmpty() || rule.line().get() == mutation.getLineNumber();
-            if (methodNameMatches && mutatorNameMatches && lineMatches) {
+            boolean mutatorOrMutatorNameMatches = mutatorMatches || (mutatorNameMatches && rule.mutator() == PitMutator.NONE);
+            if (methodNameMatches && mutatorOrMutatorNameMatches && lineMatches) {
                 return true;
             }
         }
