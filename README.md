@@ -79,9 +79,9 @@ All source code is licensed under the MIT license. Contributions to this library
 ### Annotation Details
 | Element                | Description                                                                                                                                                                                                                   | Examples                                                                                                                                                                                       |
 |:-----------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mutator (optional)     | Suppresses mutations created by mutator matching this enum (recommended). <br>If both mutator and mutatorName are provided, mutatorName is ignored.                                                                           | SuppressMutation(mutator = MATH)                                                                                                                                                               |
-| mutatorName (optional) | Suppresses mutations created by mutator with this name. If mutator is set, this value is ignored.<br/>- Mutator class name shortened (without "Mutator")<br/>- Mutator class name<br/>- Fully qualified name of mutator class | <br/>SuppressMutation(mutatorName = "Math")<br/>SuppressMutation(mutatorName = "MathMutator")<br/>SuppressMutation(mutatorName = "org.pitest.mutationtest.engine.gregor.mutators.MathMutator") |
-| line (optional)        | Restricts suppression to a specific line number, if it is in scope.                                                                                                                                                           | SuppressMutation(line = 5)                                                                                                                                                                     |
+| mutator (optional)     | Suppresses mutations created by mutator matching this enum (recommended). <br>If both mutator and mutatorName are provided, mutatorName is ignored.                                                                           | @SuppressMutation(mutator = MATH)                                                                                                                                                               |
+| mutatorName (optional) | Suppresses mutations created by mutator with this name. If mutator is set, this value is ignored.<br/>- Mutator class name shortened (without "Mutator")<br/>- Mutator class name<br/>- Fully qualified name of mutator class | <br/>@SuppressMutation(mutatorName = "Math")<br/>@SuppressMutation(mutatorName = "MathMutator")<br/>@SuppressMutation(mutatorName = "org.pitest.mutationtest.engine.gregor.mutators.MathMutator") |
+| line (optional)        | Restricts suppression to a specific line number, if it is in scope.                                                                                                                                                           | @SuppressMutation(line = 5)                                                                                                                                                                     |
 
 
 ### Example Annotations
@@ -138,7 +138,7 @@ All source code is licensed under the MIT license. Contributions to this library
         <dependency>
           <groupId>edu.hm.hafner</groupId>
           <artifactId>pitmute</artifactId>
-          <version>0.1.0</version>
+          <version>0.3.0</version>
         </dependency>
       </dependencies>
     </plugin>
