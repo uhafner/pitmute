@@ -44,7 +44,7 @@ class AnnotationExclusionFilterTest {
     void shouldOnlySuppressMutationIfClassHasAnnotationWithMatchingMutatorName() {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
 
-        var annotations = List.of(createAnnotation(List.of(MUTATOR_NAME, "Math")));
+        var annotations = List.of(createAnnotation(MUTATOR_NAME, "Math"));
         when(classTree.annotations()).thenReturn(annotations);
         when(classTree.methods()).thenReturn(List.of());
 
@@ -63,7 +63,7 @@ class AnnotationExclusionFilterTest {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
         ClassTree anotherClassTree = createClassTree("com.example.otherPath.TestClass");
 
-        var annotations = List.of(createAnnotation(List.of(MUTATOR_NAME, "Math")));
+        var annotations = List.of(createAnnotation(MUTATOR_NAME, "Math"));
         when(classTree.annotations()).thenReturn(annotations);
         when(classTree.methods()).thenReturn(List.of());
 
@@ -83,7 +83,7 @@ class AnnotationExclusionFilterTest {
     @Test
     void shouldSuppressAllMutationsWhenClassHasAnnotationWithoutValues() {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
-        var annotations = List.of(createAnnotation(List.of()));
+        var annotations = List.of(createAnnotation());
         when(classTree.annotations()).thenReturn(annotations);
         MethodTree anyMethod = createMethodTree(classTree, "anyMethod");
         MethodTree anyOtherMethod = createMethodTree(classTree, "anyOtherMethod");
@@ -110,7 +110,7 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = List.of(createAnnotation(List.of()));
+        var annotations = List.of(createAnnotation());
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
@@ -126,7 +126,7 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = List.of(createAnnotation(List.of(MUTATOR_NAME, "Math")));
+        var annotations = List.of(createAnnotation(MUTATOR_NAME, "Math"));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
@@ -160,7 +160,7 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = List.of(createAnnotation(List.of(MUTATOR_NAME, "Math")));
+        var annotations = List.of(createAnnotation(MUTATOR_NAME, "Math"));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
@@ -173,7 +173,7 @@ class AnnotationExclusionFilterTest {
     @Test
     void shouldSuppressMutationsWithClassAndMethodLevelAnnotations() {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
-        var classAnnotations = List.of(createAnnotation(List.of(MUTATOR_NAME, "Math")));
+        var classAnnotations = List.of(createAnnotation(MUTATOR_NAME, "Math"));
         when(classTree.annotations()).thenReturn(classAnnotations);
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
@@ -321,25 +321,25 @@ class AnnotationExclusionFilterTest {
         String otherName = "PrimitiveReturns";
 
         return Stream.of(
-                Arguments.of(createAnnotation(emptyList), mutations, emptyList),
-                Arguments.of(createAnnotation(List.of(LINE, matchLine)), mutations, emptyList),
-                Arguments.of(createAnnotation(List.of(LINE, otherLine)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(LINE, matchLine, MUTATOR_NAME, matchName)), mutations, onlyNegateMutation),
-                Arguments.of(createAnnotation(List.of(LINE, matchLine, MUTATOR_NAME, otherName)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(LINE, otherLine, MUTATOR_NAME, matchName)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(LINE, otherLine, MUTATOR_NAME, otherName)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(LINE, matchLine, MUTATOR_NAME, matchName, MUTATOR, matchMutator)), mutations, onlyNegateMutation),
-                Arguments.of(createAnnotation(List.of(LINE, matchLine, MUTATOR_NAME, matchName, MUTATOR, otherMutator)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(LINE, matchLine, MUTATOR_NAME, otherName, MUTATOR, matchMutator)), mutations, onlyNegateMutation),
-                Arguments.of(createAnnotation(List.of(LINE, matchLine, MUTATOR_NAME, otherName, MUTATOR, otherMutator)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(LINE, otherLine, MUTATOR_NAME, matchName, MUTATOR, matchMutator)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(LINE, otherLine, MUTATOR_NAME, matchName, MUTATOR, otherMutator)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(LINE, otherLine, MUTATOR_NAME, otherName, MUTATOR, matchMutator)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(LINE, otherLine, MUTATOR_NAME, otherName, MUTATOR, otherMutator)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(MUTATOR_NAME, matchName, MUTATOR, matchMutator)), mutations, onlyNegateMutation),
-                Arguments.of(createAnnotation(List.of(MUTATOR_NAME, matchName, MUTATOR, otherMutator)), mutations, bothMutations),
-                Arguments.of(createAnnotation(List.of(MUTATOR_NAME, otherName, MUTATOR, matchMutator)), mutations, onlyNegateMutation),
-                Arguments.of(createAnnotation(List.of(MUTATOR_NAME, otherName, MUTATOR, otherMutator)), mutations, bothMutations)
+                Arguments.of(createAnnotation(), mutations, emptyList),
+                Arguments.of(createAnnotation(LINE, matchLine), mutations, emptyList),
+                Arguments.of(createAnnotation(LINE, otherLine), mutations, bothMutations),
+                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, matchName), mutations, onlyNegateMutation),
+                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, otherName), mutations, bothMutations),
+                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, matchName), mutations, bothMutations),
+                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, otherName), mutations, bothMutations),
+                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, matchName, MUTATOR, matchMutator), mutations, onlyNegateMutation),
+                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, matchName, MUTATOR, otherMutator), mutations, bothMutations),
+                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, otherName, MUTATOR, matchMutator), mutations, onlyNegateMutation),
+                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, otherName, MUTATOR, otherMutator), mutations, bothMutations),
+                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, matchName, MUTATOR, matchMutator), mutations, bothMutations),
+                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, matchName, MUTATOR, otherMutator), mutations, bothMutations),
+                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, otherName, MUTATOR, matchMutator), mutations, bothMutations),
+                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, otherName, MUTATOR, otherMutator), mutations, bothMutations),
+                Arguments.of(createAnnotation(MUTATOR_NAME, matchName, MUTATOR, matchMutator), mutations, onlyNegateMutation),
+                Arguments.of(createAnnotation(MUTATOR_NAME, matchName, MUTATOR, otherMutator), mutations, bothMutations),
+                Arguments.of(createAnnotation(MUTATOR_NAME, otherName, MUTATOR, matchMutator), mutations, onlyNegateMutation),
+                Arguments.of(createAnnotation(MUTATOR_NAME, otherName, MUTATOR, otherMutator), mutations, bothMutations)
         );
     }
 
@@ -371,9 +371,9 @@ class AnnotationExclusionFilterTest {
         return methodTree;
     }
 
-    private static AnnotationNode createAnnotation(final List<Object> values) {
+    private static AnnotationNode createAnnotation(final Object... values) {
         var annotation = new AnnotationNode(SUPPRESS_MUTATION_DESC);
-        annotation.values = values;
+        annotation.values = List.of(values);
         return annotation;
     }
 
@@ -384,7 +384,7 @@ class AnnotationExclusionFilterTest {
 
         List<AnnotationNode> annotations = new ArrayList<>();
         for (List<Object> value : values) {
-            annotations.add(createAnnotation(value));
+            annotations.add(createAnnotation(value.toArray()));
         }
 
         container.values.add(annotations);
