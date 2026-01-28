@@ -310,16 +310,15 @@ class AnnotationExclusionFilterTest {
         MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, matchLine, THREE_INT_TO_INT_DESC);
         MutationDetails negateConditionalsMutation = createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, matchLine, THREE_INT_TO_INT_DESC);
 
-        List<MutationDetails> mutations = List.of(mathMutation, negateConditionalsMutation);
-        List<MutationDetails> bothMutations = List.of(mathMutation, negateConditionalsMutation);
+        var mutations = List.of(mathMutation, negateConditionalsMutation);
+        var bothMutations = List.of(mathMutation, negateConditionalsMutation);
+        var emptyList = List.of();
+        var onlyNegateMutation = List.of(negateConditionalsMutation);
 
         String[] matchMutator = {PIT_MUTATOR_FQCN, String.valueOf(PitMutator.MATH)};
         String[] otherMutator = {PIT_MUTATOR_FQCN, String.valueOf(PitMutator.PRIMITIVE_RETURNS)};
-
-        List<Object> emptyList = List.of();
         String matchName = "Math";
         String otherName = "PrimitiveReturns";
-        List<MutationDetails> onlyNegateMutation = List.of(negateConditionalsMutation);
 
         return Stream.of(
                 Arguments.of(createAnnotation(emptyList), mutations, emptyList),
