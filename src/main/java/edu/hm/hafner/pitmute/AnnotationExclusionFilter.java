@@ -9,6 +9,8 @@ import org.pitest.mutationtest.engine.Mutater;
 import org.pitest.mutationtest.engine.MutationDetails;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +25,7 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
     private final Map<String, List<SuppressionRule>> suppressionByClass = new HashMap<>();
     private static final String SUPPRESS_MUTATION_DESC = "Ledu/hm/hafner/pitmute/SuppressMutation;";
     private static final String SUPPRESS_MUTATIONS_DESC = "Ledu/hm/hafner/pitmute/SuppressMutations;";
+    private static final Logger LOGGER = Logger.getLogger(AnnotationExclusionFilter.class.getName());
 
     @Override
     public InterceptorType type() {
@@ -92,7 +95,16 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         }
 
         Optional<String> mutatorName = Optional.ofNullable(elements.get("mutatorName")).map(Object::toString);
-        Optional<Integer> line = Optional.ofNullable(elements.get("line")).map(Object::toString).map(Integer::parseInt);
+        Optional<Integer> line;
+        try {
+            line = Optional.ofNullable(elements.get("line"))
+                    .map(Object::toString)
+                    .map(Integer::parseInt);
+        }
+        catch (NumberFormatException e) {
+            LOGGER.log(Level.WARNING, "Unexpected non-integer value for 'line' in bytecode. Annotation is skipped.", e);
+            return;
+        }
         PitMutator mutator = PitMutator.NONE;
         var mutatorData = (String[]) elements.get("mutator");
         if (mutatorData != null && mutatorData.length > 1) {
