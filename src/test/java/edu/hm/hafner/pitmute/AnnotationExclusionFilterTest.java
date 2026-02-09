@@ -27,8 +27,8 @@ class AnnotationExclusionFilterTest {
     public static final String TEST_CLASS_FQCN = "com.example.TestClass";
     private final AnnotationExclusionFilter filter = new AnnotationExclusionFilter();
     private final Mutater mutater = mock(Mutater.class);
-    private static final String SUPPRESS_MUTATION_DESC = "Ledu/hm/hafner/pitmute/SuppressMutation;";
-    private static final String SUPPRESS_MUTATIONS_DESC = "Ledu/hm/hafner/pitmute/SuppressMutations;";
+    private static final String SUPPRESS_MUTATION_DESC = "Lany/package/SuppressMutation;";
+    private static final String SUPPRESS_MUTATIONS_DESC = "Lany/package/SuppressMutations;";
     public static final String PIT_MUTATOR_FQCN = "Ledu/hm/hafner/pitmute/PitMutator;";
     private static final String MATH_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.MathMutator";
     private static final String PRIMITIVE_RETURNS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator";

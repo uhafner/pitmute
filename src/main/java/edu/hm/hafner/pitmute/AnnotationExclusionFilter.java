@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
  */
 public class AnnotationExclusionFilter implements MutationInterceptor {
     private final Map<String, List<SuppressionRule>> suppressionByClass = new HashMap<>();
-    private static final String SUPPRESS_MUTATION_DESC = "Ledu/hm/hafner/pitmute/SuppressMutation;";
-    private static final String SUPPRESS_MUTATIONS_DESC = "Ledu/hm/hafner/pitmute/SuppressMutations;";
+    private static final String SUPPRESS_MUTATION_DESC = "SuppressMutation;";
+    private static final String SUPPRESS_MUTATIONS_DESC = "SuppressMutations;";
     private static final Logger LOGGER = Logger.getLogger(AnnotationExclusionFilter.class.getName());
 
     @Override
@@ -51,10 +51,10 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
         }
 
         for (AnnotationNode annotation : annotations) {
-            if (SUPPRESS_MUTATION_DESC.equals(annotation.desc)) {
+            if (annotation.desc.endsWith(SUPPRESS_MUTATION_DESC)) {
                 addSuppressionRuleForAnnotation(annotation, suppressionRules, className, methodName);
             }
-            else if (SUPPRESS_MUTATIONS_DESC.equals(annotation.desc)) {
+            else if (annotation.desc.endsWith(SUPPRESS_MUTATIONS_DESC)) {
                 List<AnnotationNode> repeatedAnnotations = getAnnotationsFromContainer(annotation);
                 for (AnnotationNode singleAnnotation : repeatedAnnotations) {
                     addSuppressionRuleForAnnotation(singleAnnotation, suppressionRules, className, methodName);
