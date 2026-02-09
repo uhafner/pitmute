@@ -23,7 +23,7 @@ All source code is licensed under the MIT license. Contributions to this library
     <dependency>
       <groupId>edu.hm.hafner</groupId>
       <artifactId>pitmute</artifactId>
-      <version>0.3.0</version>
+      <version>1.0.0</version>
     </dependency>
     ```
 
@@ -138,7 +138,7 @@ All source code is licensed under the MIT license. Contributions to this library
         <dependency>
           <groupId>edu.hm.hafner</groupId>
           <artifactId>pitmute</artifactId>
-          <version>0.3.0</version>
+          <version>1.0.0</version>
         </dependency>
       </dependencies>
     </plugin>
