@@ -290,6 +290,25 @@ class AnnotationExclusionFilterTest {
         assertThat(remainingMutations).containsExactly(negateConditionalsMutationInOtherMethod);
     }
 
+    @Test
+    void shouldNotRemoveMutationIfInvalidIntegerIsProvided() {
+        ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
+        when(classTree.annotations()).thenReturn(List.of());
+
+        MethodTree methodTree = createMethodTree(classTree, "method", ANY_METHOD_DESC);
+        String[] mathEnum = {PIT_MUTATOR_FQCN, String.valueOf(PitMutator.MATH)};
+        var annotations = List.of(createContainerAnnotation(List.of(List.of(LINE, "InvalidInteger"),
+                List.of(MUTATOR, mathEnum, LINE, "otherInvalidInteger"), List.of(MUTATOR_NAME, "NegateConditionals", LINE, "A"))));
+        when(methodTree.annotations()).thenReturn(annotations);
+
+        filter.begin(classTree);
+        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, 10, ANY_METHOD_DESC);
+        MutationDetails negateConditionalsMutationInOtherMethod = createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, 15, ANY_METHOD_DESC);
+        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, negateConditionalsMutationInOtherMethod), mutater);
+
+        assertThat(remainingMutations).containsExactly(mathMutation, negateConditionalsMutationInOtherMethod);
+    }
+
     @ParameterizedTest
     @MethodSource("provideTestCases")
     void shouldSuppressMutationCorrectlyForAnnotations(final AnnotationNode methodAnnotations, final List<MutationDetails> mutations, final List<MutationDetails> expectedRemainingMutations) {

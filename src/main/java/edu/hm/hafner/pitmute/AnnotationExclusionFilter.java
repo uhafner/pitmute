@@ -85,33 +85,38 @@ public class AnnotationExclusionFilter implements MutationInterceptor {
             return;
         }
 
-        if (values.size() % 2 == 1) {
-            throw new IllegalStateException("Invalid ASM AnnotationNode: expected key-value pairs in 'values' list, but found odd size: " + values);
-        }
-
-        Map<String, Object> elements = new HashMap<>();
-        for (int i = 0; i < values.size() - 1; i += 2) {
-            elements.put(values.get(i).toString(), values.get(i + 1));
-        }
-
+        Map<String, Object> elements = getAnnotationElements(values);
         Optional<String> mutatorName = Optional.ofNullable(elements.get("mutatorName")).map(Object::toString);
-        Optional<Integer> line;
-        try {
-            line = Optional.ofNullable(elements.get("line"))
-                    .map(Object::toString)
-                    .map(Integer::parseInt);
-        }
-        catch (NumberFormatException e) {
-            LOGGER.log(Level.WARNING, "Unexpected non-integer value for 'line' in bytecode. Annotation is skipped.", e);
-            return;
-        }
+
         PitMutator mutator = PitMutator.NONE;
-        var mutatorData = (String[]) elements.get("mutator");
-        if (mutatorData != null && mutatorData.length > 1) {
+        if (elements.get("mutator") instanceof String[] mutatorData && mutatorData.length > 1) {
             mutator = PitMutator.valueOf(mutatorData[1]);
         }
 
+        Optional<Integer> line = Optional.empty();
+        Object rawLine = elements.get("line");
+
+        if (rawLine != null) {
+            try {
+                line = Optional.of(Integer.parseInt(rawLine.toString()));
+            }
+            catch (NumberFormatException e) {
+                LOGGER.log(Level.WARNING, "Unexpected non-integer value for 'line' in bytecode. Annotation is skipped.", e);
+                return;
+            }
+        }
         suppressionRules.add(new SuppressionRule(className, methodName, mutator, mutatorName, line));
+    }
+
+    private static Map<String, Object> getAnnotationElements(final List<Object> values) {
+        if (values.size() % 2 != 0) {
+            throw new IllegalStateException("Invalid ASM AnnotationNode: expected key-value pairs in 'values' list, but found odd size: " + values);
+        }
+        Map<String, Object> elements = new HashMap<>();
+        for (int i = 0; i < values.size(); i += 2) {
+            elements.put(values.get(i).toString(), values.get(i + 1));
+        }
+        return elements;
     }
 
     @Override
