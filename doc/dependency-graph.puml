@@ -6,20 +6,20 @@ skinparam rectangle {
   BackgroundColor<<runtime>> lightBlue
   BackgroundColor<<provided>> lightGray
 }
-rectangle "pitest\n\n1.22.0" as org_pitest_pitest_jar<<provided>>
-rectangle "asm\n\n9.9" as org_ow2_asm_asm_jar<<provided>>
-rectangle "asm-commons\n\n9.9" as org_ow2_asm_asm_commons_jar<<provided>>
-rectangle "asm-tree\n\n9.9" as org_ow2_asm_asm_tree_jar<<provided>>
-rectangle "pitest-entry\n\n1.22.0" as org_pitest_pitest_entry_jar<<provided>>
-rectangle "asm-util\n\n9.9" as org_ow2_asm_asm_util_jar<<provided>>
-rectangle "asm-analysis\n\n9.9" as org_ow2_asm_asm_analysis_jar<<provided>>
+rectangle "pitest\n\n1.22.1" as org_pitest_pitest_jar<<provided>>
+rectangle "asm\n\n9.9.1" as org_ow2_asm_asm_jar<<provided>>
+rectangle "asm-commons\n\n9.9.1" as org_ow2_asm_asm_commons_jar<<provided>>
+rectangle "asm-tree\n\n9.9.1" as org_ow2_asm_asm_tree_jar<<provided>>
+rectangle "pitest-entry\n\n1.22.1" as org_pitest_pitest_entry_jar<<provided>>
+rectangle "asm-util\n\n9.9.1" as org_ow2_asm_asm_util_jar<<provided>>
+rectangle "asm-analysis\n\n9.9.1" as org_ow2_asm_asm_analysis_jar<<provided>>
 rectangle "commons-text\n\n1.14.0" as org_apache_commons_commons_text_jar<<provided>>
 rectangle "commons-lang3\n\n3.20.0" as org_apache_commons_commons_lang3_jar
-rectangle "pitmute\n\n0.3.0-SNAPSHOT" as edu_hm_hafner_pitmute_jar
-rectangle "codingstyle\n\n5.25.0" as edu_hm_hafner_codingstyle_jar
+rectangle "pitmute\n\n1.1.0-SNAPSHOT" as edu_hm_hafner_pitmute_jar
+rectangle "codingstyle\n\n6.3.0" as edu_hm_hafner_codingstyle_jar
 rectangle "spotbugs-annotations\n\n4.9.8" as com_github_spotbugs_spotbugs_annotations_jar
 rectangle "jsr305\n\n3.0.2" as com_google_code_findbugs_jsr305_jar
-rectangle "error_prone_annotations\n\n2.45.0" as com_google_errorprone_error_prone_annotations_jar
+rectangle "error_prone_annotations\n\n2.47.0" as com_google_errorprone_error_prone_annotations_jar
 rectangle "commons-io\n\n2.21.0" as commons_io_commons_io_jar
 rectangle "streamex\n\n0.8.4" as one_util_streamex_jar
 org_pitest_pitest_jar .[#ABABAB].> org_ow2_asm_asm_jar
