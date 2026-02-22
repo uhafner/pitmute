@@ -3,7 +3,7 @@ package edu.hm.hafner.pitmute;
 import java.util.Optional;
 
 /**
- * Represents a suppression rule derived from a {@link SuppressMutation} annotation.
+ * Represents a suppression rule derived from a {@code SuppressMutation} annotation.
  * Used by the {@link AnnotationExclusionFilter} to determine the scope (class or method) and optionally the type of mutator or line to be ignored.
  *
  * @param className   the name of the class where the annotation is located and applied
