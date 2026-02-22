@@ -46,6 +46,7 @@
   <properties>
     <scmTag>HEAD</scmTag>
     <module.name>edu.hm.hafner.pitmute</module.name>
+    <pitmute.version>1.0.0</pitmute.version>
   </properties>
 
   <dependencies>
