@@ -12,7 +12,7 @@
   </parent>
 
   <artifactId>pitmute</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
 
   <packaging>jar</packaging>
 
@@ -117,13 +117,14 @@
           <configuration combine.children="append">
             <features>
               <feature>+FCSV(csvFile[etc/pitmute.csv])</feature>
+              <feature>+FANNOT</feature>
             </features>
           </configuration>
           <dependencies>
             <dependency>
               <groupId>edu.hm.hafner</groupId>
               <artifactId>pitmute</artifactId>
-              <version>0.1.0</version>
+              <version>${pitmute.version}</version>
             </dependency>
           </dependencies>
         </plugin>
