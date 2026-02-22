@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- * Filters generated PIT mutations by inspecting bytecode for {@link SuppressMutation} annotations on classes and methods.
+ * Filters generated PIT mutations by inspecting bytecode for {@code SuppressMutation} annotations on classes and methods.
  *
  * <p>
  * Mutations are excluded based on the presence of an annotation and its optional parameters.

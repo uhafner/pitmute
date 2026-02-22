@@ -7,7 +7,7 @@ import org.pitest.plugin.Feature;
 
 /**
  * Factory for creating an {@link AnnotationExclusionFilter} instance to exclude mutations in areas
- * marked with the {@link SuppressMutation} annotation.
+ * marked with the {@code SuppressMutation} annotation.
  *
  * <p>
  * For details on usage and configuration, please refer to the project's README.

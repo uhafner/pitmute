@@ -24,22 +24,22 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class AnnotationExclusionFilterTest {
-    public static final String TEST_CLASS_FQCN = "com.example.TestClass";
+    private static final String TEST_CLASS_FQCN = "com.example.TestClass";
     private final AnnotationExclusionFilter filter = new AnnotationExclusionFilter();
     private final Mutater mutater = mock(Mutater.class);
     private static final String SUPPRESS_MUTATION_DESC = "Lany/package/SuppressMutation;";
     private static final String SUPPRESS_MUTATIONS_DESC = "Lany/package/SuppressMutations;";
-    public static final String PIT_MUTATOR_FQCN = "Ledu/hm/hafner/pitmute/PitMutator;";
+    private static final String PIT_MUTATOR_FQCN = "Ledu/hm/hafner/pitmute/PitMutator;";
     private static final String MATH_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.MathMutator";
     private static final String PRIMITIVE_RETURNS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator";
     private static final String NEGATE_CONDITIONALS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator";
-    public static final String MUTATOR_NAME = "mutatorName";
-    public static final String MUTATOR = "mutator";
-    public static final String LINE = "line";
+    private static final String MUTATOR_NAME = "mutatorName";
+    private static final String MUTATOR = "mutator";
+    private static final String LINE = "line";
     private static final int FIRST_LINE = 1;
     private static final String ANY_METHOD_DESC = "(II)I";
-    public static final String THREE_INT_TO_INT_DESC = "(III)I";
-    public static final String EMPTY_TO_VOID_DESC = "()V";
+    private static final String THREE_INT_TO_INT_DESC = "(III)I";
+    private static final String EMPTY_TO_VOID_DESC = "()V";
 
     @ParameterizedTest(name = "{index} => mutatorName: {0}")
     @ValueSource(strings = {"Math", "MathMutator", MATH_MUTATOR_FQCN})
