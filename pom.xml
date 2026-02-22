@@ -45,8 +45,7 @@
 
   <properties>
     <scmTag>HEAD</scmTag>
-    <module.name>edu.hm.hafner.pit.suppress</module.name>
-    <pitmute.version>1.0.0-SNAPSHOT</pitmute.version>
+    <module.name>edu.hm.hafner.pitmute</module.name>
   </properties>
 
   <dependencies>
@@ -65,9 +64,9 @@
         <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
         <configuration>
           <packages>
-            <package>edu.hm.hafner.pit.suppress</package>
+            <package>edu.hm.hafner.pitmute</package>
           </packages>
-          <entryPointClassPackage>edu.hm.hafner.pit.suppress.assertions</entryPointClassPackage>
+          <entryPointClassPackage>edu.hm.hafner.pitmute.assertions</entryPointClassPackage>
         </configuration>
       </plugin>
       <plugin>

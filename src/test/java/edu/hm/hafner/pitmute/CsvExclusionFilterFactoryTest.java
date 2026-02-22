@@ -203,7 +203,7 @@ class CsvExclusionFilterFactoryTest {
         assertThat(factory.description()).contains("CSV file");
     }
 
-    List<CsvExclusionEntry> getEntriesFromFile(final String fileName) throws URISyntaxException {
+    private List<CsvExclusionEntry> getEntriesFromFile(final String fileName) throws URISyntaxException {
         URL resource = getClass().getClassLoader().getResource(fileName);
 
         assertThat(resource).isNotNull();
