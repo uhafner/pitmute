@@ -9,11 +9,9 @@ import org.pitest.plugin.Feature;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -117,16 +115,22 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
         try {
             return Files.readAllLines(Paths.get(csvPath), StandardCharsets.UTF_8);
         }
-        catch (IOException e) {
+        catch (NoSuchFileException e) {
             if (allowMissingFile) {
-                logger.log(Level.INFO, "Mutation exclusion via CSV is enabled and a path is configured, but no "
-                        + "CSV file was found. To use this feature, add a CSV file at the specified location: ", e);
+                logger.log(Level.INFO,
+                        "Mutation exclusion via CSV is enabled and the path is configured, "
+                                + "but no CSV file was found. "
+                                + "To use this feature, add a CSV file at the specified location: ");
                 return List.of();
             }
             else {
-                throw new IllegalStateException("Failed to read CSV file. Please verify that the path is correct and the "
-                        + "file exists: " + csvPath, e);
+                throw new IllegalStateException("Failed to read CSV file. Please verify that the path is correct "
+                        + "and the file exists: " + csvPath, e);
             }
+        }
+        catch (IOException e) {
+            throw new IllegalStateException("Failed to read CSV file. Please verify that the path is correct "
+                    + "and the file is readable: " + csvPath, e);
         }
     }
 

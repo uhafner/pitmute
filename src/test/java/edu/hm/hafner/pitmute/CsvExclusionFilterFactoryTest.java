@@ -11,7 +11,6 @@ import org.pitest.plugin.FeatureSetting;
 
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -71,13 +70,14 @@ class CsvExclusionFilterFactoryTest {
         InterceptorParameters params = mock(InterceptorParameters.class);
         FeatureSetting settings = mock(FeatureSetting.class);
 
-        when(settings.getString("csvFile")).thenReturn(Optional.of("src/test/resources/notExistingFile.csv"));
+        var fileName = "src/test/resources/notExistingFile.csv";
+        when(settings.getString("csvFile")).thenReturn(Optional.of(fileName));
         when(settings.getString("allowMissingFile")).thenReturn(Optional.of("true"));
         when(params.settings()).thenReturn(Optional.of(settings));
 
         MutationInterceptor mutationInterceptor = factory.createInterceptor(params);
 
-        verify(mockLogger, times(1)).log(eq(Level.INFO), contains("Mutation exclusion via CSV is enabled"), any(NoSuchFileException.class));
+        verify(mockLogger, times(1)).log(eq(Level.INFO), contains("Mutation exclusion via CSV is enabled"));
         assertThat(mutationInterceptor).isInstanceOf(CsvExclusionFilter.class);
     }
 
