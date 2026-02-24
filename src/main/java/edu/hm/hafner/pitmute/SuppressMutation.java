@@ -5,12 +5,14 @@ import java.lang.annotation.*;
 import static edu.hm.hafner.pitmute.PitMutator.NONE;
 
 /**
- * Suppresses specific mutations when the feature defined in {@link AnnotationExclusionFilterFactory} is enabled.
+ * Suppresses specific mutations when the feature {@code FANNOT} is enabled in PitMute.
  *
  * <p>
- * This annotation can be applied to classes, methods or constructors. When used without parameters all mutations in that scope are suppressed.
- * For more information, please see the README.
+ * This annotation can be applied to classes, methods or constructors. When used without parameters, all mutations in
+ * that scope are suppressed. For more information, please see the README in PitMute.
  * </p>
+ *
+ * @see <a href="https://github.com/uhafner/pitmute">PitMute</a>
  */
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.CONSTRUCTOR})
 @Retention(RetentionPolicy.RUNTIME)
