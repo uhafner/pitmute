@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * Container annotation for repeating the {@link SuppressMutation} annotation.
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.CONSTRUCTOR})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SuppressMutations {
     /**
