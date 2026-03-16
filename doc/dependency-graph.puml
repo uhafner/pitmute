@@ -6,11 +6,11 @@ skinparam rectangle {
   BackgroundColor<<runtime>> lightBlue
   BackgroundColor<<provided>> lightGray
 }
-rectangle "pitest\n\n1.22.1" as org_pitest_pitest_jar<<provided>>
+rectangle "pitest\n\n1.23.0" as org_pitest_pitest_jar<<provided>>
 rectangle "asm\n\n9.9.1" as org_ow2_asm_asm_jar<<provided>>
 rectangle "asm-commons\n\n9.9.1" as org_ow2_asm_asm_commons_jar<<provided>>
 rectangle "asm-tree\n\n9.9.1" as org_ow2_asm_asm_tree_jar<<provided>>
-rectangle "pitest-entry\n\n1.22.1" as org_pitest_pitest_entry_jar<<provided>>
+rectangle "pitest-entry\n\n1.23.0" as org_pitest_pitest_entry_jar<<provided>>
 rectangle "asm-util\n\n9.9.1" as org_ow2_asm_asm_util_jar<<provided>>
 rectangle "asm-analysis\n\n9.9.1" as org_ow2_asm_asm_analysis_jar<<provided>>
 rectangle "commons-text\n\n1.14.0" as org_apache_commons_commons_text_jar<<provided>>
