@@ -221,9 +221,9 @@ class AnnotationExclusionFilterTest {
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
-        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN, 5);
-        MutationDetails primitiveReturnsMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN, 7);
-        MutationDetails negateConditionalsMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN, 3);
+        MutationDetails mathMutation = createMutation("annotatedMethod", MATH_MUTATOR_FQCN, 5);
+        MutationDetails primitiveReturnsMutation = createMutation("annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN, 7);
+        MutationDetails negateConditionalsMutation = createMutation("annotatedMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN, 3);
         Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, primitiveReturnsMutation, negateConditionalsMutation), mutater);
 
         assertThat(remainingMutations).containsExactly(primitiveReturnsMutation);
@@ -240,10 +240,10 @@ class AnnotationExclusionFilterTest {
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
-        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN, 5);
-        MutationDetails negateConditionalsMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN, 5);
-        MutationDetails otherMathMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN, 3);
-        MutationDetails primitiveReturnsMutation = createMutation(TEST_CLASS_FQCN, "otherMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN, 10);
+        MutationDetails mathMutation = createMutation("annotatedMethod", MATH_MUTATOR_FQCN, 5);
+        MutationDetails negateConditionalsMutation = createMutation("annotatedMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN, 5);
+        MutationDetails otherMathMutation = createMutation("annotatedMethod", MATH_MUTATOR_FQCN, 3);
+        MutationDetails primitiveReturnsMutation = createMutation("otherMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN, 10);
         Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, negateConditionalsMutation, primitiveReturnsMutation, otherMathMutation), mutater);
 
         assertThat(remainingMutations).containsExactly(primitiveReturnsMutation);
@@ -327,7 +327,6 @@ class AnnotationExclusionFilterTest {
 
     private static Stream<Arguments> provideTestCases() {
         int matchLine = 5;
-        int otherLine = 6;
         MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, matchLine, THREE_INT_TO_INT_DESC);
         MutationDetails negateConditionalsMutation = createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, matchLine, THREE_INT_TO_INT_DESC);
 
@@ -341,6 +340,7 @@ class AnnotationExclusionFilterTest {
         String matchName = MATH_MUTATOR_FQCN;
         String otherName = "PrimitiveReturns";
 
+        int otherLine = 6;
         return Stream.of(
                 Arguments.of(createAnnotation(), mutations, emptyList),
                 Arguments.of(createAnnotation(LINE, matchLine), mutations, emptyList),
@@ -416,8 +416,8 @@ class AnnotationExclusionFilterTest {
         return createMutation(className, methodName, mutatorFqcn, FIRST_LINE, ANY_METHOD_DESC);
     }
 
-    private MutationDetails createMutation(final String className, final String methodName, final String mutatorFqcn, final int lineNumber) {
-        return createMutation(className, methodName, mutatorFqcn, lineNumber, ANY_METHOD_DESC);
+    private MutationDetails createMutation(final String methodName, final String mutatorFqcn, final int lineNumber) {
+        return createMutation(TEST_CLASS_FQCN, methodName, mutatorFqcn, lineNumber, ANY_METHOD_DESC);
     }
 
     private static MutationDetails createMutation(final String className, final String methodName, final String mutatorFqcn, final int lineNumber, final String descriptor) {
