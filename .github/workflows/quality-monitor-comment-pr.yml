@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout PR
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Fetch reports from dependency check and quality monitor workflows
         env:
           REPO: ${{ github.repository }}
