@@ -1,19 +1,17 @@
 package edu.hm.hafner.pitmute;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.pitest.bytecode.analysis.ClassTree;
 import org.pitest.mutationtest.build.InterceptorType;
 import org.pitest.mutationtest.build.MutationInterceptor;
 import org.pitest.mutationtest.engine.Mutater;
 import org.pitest.mutationtest.engine.MutationDetails;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 /**
- * Filters generated PIT mutations based on a list of {@link CsvExclusionEntry} entries.
- * Only mutations matching the criteria specified in the provided entries are suppressed.
- * For more information, please see the README.
+ * Filters generated PIT mutations based on a list of {@link CsvExclusionEntry} entries. Only mutations matching the
+ * criteria specified in the provided entries are suppressed. For more information, please see the README.
  */
 public class CsvExclusionFilter implements MutationInterceptor {
     private final List<CsvExclusionEntry> entries;
@@ -57,8 +55,10 @@ public class CsvExclusionFilter implements MutationInterceptor {
     private boolean shouldSuppressMutation(final MutationDetails mutation, final CsvExclusionEntry entry) {
         boolean classNameMatches = classNameMatches(mutation.getClassName().asJavaName(), entry.className());
         boolean mutationNameMatches = mutationNameMatches(mutation.getMutator(), entry);
-        boolean startLineMatches = entry.startLine().isEmpty() || mutation.getLineNumber() >= entry.startLine().get();
-        boolean endLineMatches = entry.endLine().isEmpty() || mutation.getLineNumber() <= entry.endLine().get();
+        boolean startLineMatches = entry.startLine().isEmpty()
+                || mutation.getLineNumber() >= entry.startLine().get();
+        boolean endLineMatches = entry.endLine().isEmpty()
+                || mutation.getLineNumber() <= entry.endLine().get();
 
         return classNameMatches && mutationNameMatches && startLineMatches && endLineMatches;
     }
@@ -80,8 +80,11 @@ public class CsvExclusionFilter implements MutationInterceptor {
 
         String mutationNameEntry = entry.mutationName().get();
         String mutationName = fqcn.substring(fqcn.lastIndexOf('.') + 1);
-        String shortMutationName = mutationName.endsWith("Mutator") ? mutationName.substring(0, mutationName.length() - 7) : mutationName;
-        return fqcn.equals(mutationNameEntry) || mutationName.equals(mutationNameEntry) || shortMutationName.equals(mutationNameEntry);
+        String shortMutationName =
+                mutationName.endsWith("Mutator") ? mutationName.substring(0, mutationName.length() - 7) : mutationName;
+        return fqcn.equals(mutationNameEntry)
+                || mutationName.equals(mutationNameEntry)
+                || shortMutationName.equals(mutationNameEntry);
     }
 
     @Override

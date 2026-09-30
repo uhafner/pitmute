@@ -6,12 +6,10 @@ import org.pitest.mutationtest.build.MutationInterceptorFactory;
 import org.pitest.plugin.Feature;
 
 /**
- * Factory for creating an {@link AnnotationExclusionFilter} instance to exclude mutations in areas
- * marked with the {@code SuppressMutation} annotation.
+ * Factory for creating an {@link AnnotationExclusionFilter} instance to exclude mutations in areas marked with the
+ * {@code SuppressMutation} annotation.
  *
- * <p>
- * For details on usage and configuration, please refer to the project's README.
- * </p>
+ * <p>For details on usage and configuration, please refer to the project's README.
  */
 public class AnnotationExclusionFilterFactory implements MutationInterceptorFactory {
     @Override
@@ -31,4 +29,3 @@ public class AnnotationExclusionFilterFactory implements MutationInterceptorFact
         return "Exclude mutations based on annotations";
     }
 }
-

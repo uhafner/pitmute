@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
@@ -7,7 +6,7 @@
   <parent>
     <groupId>edu.hm.hafner</groupId>
     <artifactId>codingstyle-pom</artifactId>
-    <version>6.18.0</version>
+    <version>7.0.0</version>
     <relativePath />
   </parent>
 
@@ -30,8 +29,8 @@
 
   <developers>
     <developer>
-      <name>Ullrich Hafner</name>
       <id>uhafner</id>
+      <name>Ullrich Hafner</name>
       <email>ullrich.hafner@gmail.com</email>
     </developer>
   </developers>
@@ -39,8 +38,8 @@
   <scm>
     <connection>scm:git:https://github.com/uhafner/pitmute.git</connection>
     <developerConnection>scm:git:git@github.com:uhafner/pitmute.git</developerConnection>
-    <url>https://github.com/uhafner/pitmute</url>
     <tag>${scmTag}</tag>
+    <url>https://github.com/uhafner/pitmute</url>
   </scm>
 
   <properties>
@@ -58,6 +57,28 @@
   </dependencies>
 
   <build>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.pitest</groupId>
+          <artifactId>pitest-maven</artifactId>
+          <configuration combine.children="append">
+            <features>
+              <feature>+FCSV(csvFile[etc/pitmute.csv])</feature>
+              <feature>+FANNOT</feature>
+            </features>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>edu.hm.hafner</groupId>
+              <artifactId>pitmute</artifactId>
+              <version>1.1.0</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.assertj</groupId>
@@ -108,28 +129,6 @@
         </configuration>
       </plugin>
     </plugins>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.pitest</groupId>
-          <artifactId>pitest-maven</artifactId>
-          <configuration combine.children="append">
-            <features>
-              <feature>+FCSV(csvFile[etc/pitmute.csv])</feature>
-              <feature>+FANNOT</feature>
-            </features>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>edu.hm.hafner</groupId>
-              <artifactId>pitmute</artifactId>
-              <version>1.1.0</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
 </project>

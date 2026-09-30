@@ -1,13 +1,7 @@
 package edu.hm.hafner.pitmute;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.pitest.mutationtest.build.InterceptorParameters;
-import org.pitest.mutationtest.build.MutationInterceptor;
-import org.pitest.plugin.Feature;
-import org.pitest.plugin.FeatureSetting;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -17,9 +11,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.pitest.mutationtest.build.InterceptorParameters;
+import org.pitest.mutationtest.build.MutationInterceptor;
+import org.pitest.plugin.Feature;
+import org.pitest.plugin.FeatureSetting;
 
 class CsvExclusionFilterFactoryTest {
     private CsvExclusionFilterFactory factory = new CsvExclusionFilterFactory();
@@ -45,7 +44,8 @@ class CsvExclusionFilterFactoryTest {
         when(settings.getString("csvFile")).thenReturn(Optional.of("notExistingPath/validFormattedExclusions.csv"));
         when(params.settings()).thenReturn(Optional.of(settings));
 
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> factory.createInterceptor(params))
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> factory.createInterceptor(params))
                 .withMessageContaining("Failed to read CSV file");
     }
 
@@ -59,7 +59,8 @@ class CsvExclusionFilterFactoryTest {
         when(settings.getString("allowMissingFile")).thenReturn(Optional.of(allowMissingFile));
         when(params.settings()).thenReturn(Optional.of(settings));
 
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> factory.createInterceptor(params))
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> factory.createInterceptor(params))
                 .withMessageContaining("Failed to read CSV file");
     }
 
@@ -119,7 +120,11 @@ class CsvExclusionFilterFactoryTest {
 
         assertThat(entries)
                 .hasSize(8)
-                .extracting(CsvExclusionEntry::className, CsvExclusionEntry::mutationName, CsvExclusionEntry::startLine, CsvExclusionEntry::endLine)
+                .extracting(
+                        CsvExclusionEntry::className,
+                        CsvExclusionEntry::mutationName,
+                        CsvExclusionEntry::startLine,
+                        CsvExclusionEntry::endLine)
                 .containsExactly(
                         tuple("ClassName", Optional.empty(), Optional.empty(), Optional.empty()),
                         tuple("ClassName", Optional.of("Mutator"), Optional.empty(), Optional.empty()),
@@ -159,7 +164,11 @@ class CsvExclusionFilterFactoryTest {
 
         assertThat(entries)
                 .hasSize(5)
-                .extracting(CsvExclusionEntry::className, CsvExclusionEntry::mutationName, CsvExclusionEntry::startLine, CsvExclusionEntry::endLine)
+                .extracting(
+                        CsvExclusionEntry::className,
+                        CsvExclusionEntry::mutationName,
+                        CsvExclusionEntry::startLine,
+                        CsvExclusionEntry::endLine)
                 .containsExactly(
                         tuple("Main", Optional.empty(), Optional.empty(), Optional.empty()),
                         tuple("Main", Optional.empty(), Optional.empty(), Optional.empty()),

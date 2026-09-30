@@ -1,5 +1,12 @@
 package edu.hm.hafner.pitmute;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,14 +22,6 @@ import org.pitest.mutationtest.engine.Mutater;
 import org.pitest.mutationtest.engine.MutationDetails;
 import org.pitest.mutationtest.engine.MutationIdentifier;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 class AnnotationExclusionFilterTest {
     private static final String TEST_CLASS_FQCN = "com.example.TestClass";
     private final AnnotationExclusionFilter filter = new AnnotationExclusionFilter();
@@ -31,8 +30,10 @@ class AnnotationExclusionFilterTest {
     private static final String SUPPRESS_MUTATIONS_DESC = "Lany/package/SuppressMutations;";
     private static final String PIT_MUTATOR_FQCN = "Ledu/hm/hafner/pitmute/PitMutator;";
     private static final String MATH_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.MathMutator";
-    private static final String PRIMITIVE_RETURNS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator";
-    private static final String NEGATE_CONDITIONALS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator";
+    private static final String PRIMITIVE_RETURNS_MUTATOR_FQCN =
+            "org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator";
+    private static final String NEGATE_CONDITIONALS_MUTATOR_FQCN =
+            "org.pitest.mutationtest.engine.gregor.mutators.NegateConditionalsMutator";
     private static final String MUTATOR_NAME = "mutatorName";
     private static final String MUTATOR = "mutator";
     private static final String LINE = "line";
@@ -53,9 +54,11 @@ class AnnotationExclusionFilterTest {
         filter.begin(classTree);
 
         MutationDetails matchingMutation = createMutation(TEST_CLASS_FQCN, "anyMethod", MATH_MUTATOR_FQCN);
-        MutationDetails notMatchingMutation = createMutation(TEST_CLASS_FQCN, "anyMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
+        MutationDetails notMatchingMutation =
+                createMutation(TEST_CLASS_FQCN, "anyMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
 
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(matchingMutation, notMatchingMutation), mutater);
+        Collection<MutationDetails> remainingMutations =
+                filter.intercept(List.of(matchingMutation, notMatchingMutation), mutater);
 
         assertThat(remainingMutations).containsExactly(notMatchingMutation);
     }
@@ -75,7 +78,8 @@ class AnnotationExclusionFilterTest {
         filter.begin(classTree);
         filter.begin(anotherClassTree);
 
-        MutationDetails mathMutation = createMutation("com.example.otherPath.TestClass", "anyMethod", MATH_MUTATOR_FQCN);
+        MutationDetails mathMutation =
+                createMutation("com.example.otherPath.TestClass", "anyMethod", MATH_MUTATOR_FQCN);
 
         Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation), mutater);
 
@@ -133,8 +137,10 @@ class AnnotationExclusionFilterTest {
 
         filter.begin(classTree);
         MutationDetails matchingMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN);
-        MutationDetails notMatchingMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(matchingMutation, notMatchingMutation), mutater);
+        MutationDetails notMatchingMutation =
+                createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
+        Collection<MutationDetails> remainingMutations =
+                filter.intercept(List.of(matchingMutation, notMatchingMutation), mutater);
 
         assertThat(remainingMutations).containsExactly(notMatchingMutation);
     }
@@ -145,13 +151,16 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = List.of(createContainerAnnotation(List.of(List.of(MUTATOR_NAME, "Math"), List.of(MUTATOR_NAME, "PrimitiveReturns"))));
+        var annotations = List.of(createContainerAnnotation(
+                List.of(List.of(MUTATOR_NAME, "Math"), List.of(MUTATOR_NAME, "PrimitiveReturns"))));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
         MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN);
-        MutationDetails primitiveReturnsMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, primitiveReturnsMutation), mutater);
+        MutationDetails primitiveReturnsMutation =
+                createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
+        Collection<MutationDetails> remainingMutations =
+                filter.intercept(List.of(mathMutation, primitiveReturnsMutation), mutater);
 
         assertThat(remainingMutations).isEmpty();
     }
@@ -179,15 +188,22 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(classAnnotations);
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = List.of(createContainerAnnotation(List.of(List.of(MUTATOR_NAME, "Math"), List.of(MUTATOR_NAME, "PrimitiveReturns"), List.of(MUTATOR_NAME, "NegateConditionals"))));
+        var annotations = List.of(createContainerAnnotation(List.of(
+                List.of(MUTATOR_NAME, "Math"),
+                List.of(MUTATOR_NAME, "PrimitiveReturns"),
+                List.of(MUTATOR_NAME, "NegateConditionals"))));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
         MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", MATH_MUTATOR_FQCN);
-        MutationDetails primitiveReturnsMutation = createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
-        MutationDetails negateConditionalsMutation = createMutation(TEST_CLASS_FQCN, "otherMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN);
+        MutationDetails primitiveReturnsMutation =
+                createMutation(TEST_CLASS_FQCN, "annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN);
+        MutationDetails negateConditionalsMutation =
+                createMutation(TEST_CLASS_FQCN, "otherMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN);
         MutationDetails mathMutationInOtherMethod = createMutation(TEST_CLASS_FQCN, "otherMethod", MATH_MUTATOR_FQCN);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, primitiveReturnsMutation, negateConditionalsMutation, mathMutationInOtherMethod), mutater);
+        Collection<MutationDetails> remainingMutations = filter.intercept(
+                List.of(mathMutation, primitiveReturnsMutation, negateConditionalsMutation, mathMutationInOtherMethod),
+                mutater);
 
         assertThat(remainingMutations).containsExactly(negateConditionalsMutation);
     }
@@ -201,13 +217,16 @@ class AnnotationExclusionFilterTest {
         var invalidContainerAnnotation = List.of(createContainerAnnotation(List.of(List.of(MUTATOR_NAME))));
         when(methodTreeWithInvalidContainer.annotations()).thenReturn(invalidContainerAnnotation);
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> filter.begin(classTree))
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> filter.begin(classTree))
                 .withMessageContaining("Invalid ASM AnnotationNode");
 
-        invalidContainerAnnotation = List.of(createContainerAnnotation(List.of(List.of(MUTATOR_NAME, "NegateConditionals", LINE))));
+        invalidContainerAnnotation =
+                List.of(createContainerAnnotation(List.of(List.of(MUTATOR_NAME, "NegateConditionals", LINE))));
         when(methodTreeWithInvalidContainer.annotations()).thenReturn(invalidContainerAnnotation);
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> filter.begin(classTree))
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> filter.begin(classTree))
                 .withMessageContaining("Invalid ASM AnnotationNode");
     }
 
@@ -217,14 +236,19 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = List.of(createContainerAnnotation(List.of(List.of(MUTATOR_NAME, "Math", LINE, 5), List.of(LINE, 2, MUTATOR_NAME, "PrimitiveReturns"), List.of(LINE, 3))));
+        var annotations = List.of(createContainerAnnotation(List.of(
+                List.of(MUTATOR_NAME, "Math", LINE, 5),
+                List.of(LINE, 2, MUTATOR_NAME, "PrimitiveReturns"),
+                List.of(LINE, 3))));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
         MutationDetails mathMutation = createMutation("annotatedMethod", MATH_MUTATOR_FQCN, 5);
         MutationDetails primitiveReturnsMutation = createMutation("annotatedMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN, 7);
-        MutationDetails negateConditionalsMutation = createMutation("annotatedMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN, 3);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, primitiveReturnsMutation, negateConditionalsMutation), mutater);
+        MutationDetails negateConditionalsMutation =
+                createMutation("annotatedMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN, 3);
+        Collection<MutationDetails> remainingMutations =
+                filter.intercept(List.of(mathMutation, primitiveReturnsMutation, negateConditionalsMutation), mutater);
 
         assertThat(remainingMutations).containsExactly(primitiveReturnsMutation);
     }
@@ -235,16 +259,22 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "annotatedMethod");
-        var annotations = List.of(createContainerAnnotation(List.of(List.of(LINE, 5), List.of(MUTATOR_NAME, "Math", LINE, 5),
-                List.of(LINE, 10), List.of(MUTATOR_NAME, "Math", LINE, 3))));
+        var annotations = List.of(createContainerAnnotation(List.of(
+                List.of(LINE, 5),
+                List.of(MUTATOR_NAME, "Math", LINE, 5),
+                List.of(LINE, 10),
+                List.of(MUTATOR_NAME, "Math", LINE, 3))));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
         MutationDetails mathMutation = createMutation("annotatedMethod", MATH_MUTATOR_FQCN, 5);
-        MutationDetails negateConditionalsMutation = createMutation("annotatedMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN, 5);
+        MutationDetails negateConditionalsMutation =
+                createMutation("annotatedMethod", NEGATE_CONDITIONALS_MUTATOR_FQCN, 5);
         MutationDetails otherMathMutation = createMutation("annotatedMethod", MATH_MUTATOR_FQCN, 3);
         MutationDetails primitiveReturnsMutation = createMutation("otherMethod", PRIMITIVE_RETURNS_MUTATOR_FQCN, 10);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, negateConditionalsMutation, primitiveReturnsMutation, otherMathMutation), mutater);
+        Collection<MutationDetails> remainingMutations = filter.intercept(
+                List.of(mathMutation, negateConditionalsMutation, primitiveReturnsMutation, otherMathMutation),
+                mutater);
 
         assertThat(remainingMutations).containsExactly(primitiveReturnsMutation);
     }
@@ -255,7 +285,8 @@ class AnnotationExclusionFilterTest {
         when(classTree.annotations()).thenReturn(List.of());
 
         MethodTree methodTree = createMethodTree(classTree, "method", THREE_INT_TO_INT_DESC);
-        var annotation = List.of(createContainerAnnotation(List.of(List.of(MUTATOR_NAME, "Math"), List.of(MUTATOR_NAME, "NegateConditionals"))));
+        var annotation = List.of(createContainerAnnotation(
+                List.of(List.of(MUTATOR_NAME, "Math"), List.of(MUTATOR_NAME, "NegateConditionals"))));
         when(methodTree.annotations()).thenReturn(annotation);
 
         MethodTree methodTreeWithoutAnnotations = createMethodTree(classTree, "method", EMPTY_TO_VOID_DESC);
@@ -264,12 +295,17 @@ class AnnotationExclusionFilterTest {
         when(classTree.methods()).thenReturn(List.of(methodTree, methodTreeWithoutAnnotations));
 
         filter.begin(classTree);
-        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, 10, THREE_INT_TO_INT_DESC);
-        MutationDetails mathMutationInOtherMethod = createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, 50, EMPTY_TO_VOID_DESC);
-        MutationDetails negateConditionalsMutationInOtherMethod = createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, 51, EMPTY_TO_VOID_DESC);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, mathMutationInOtherMethod, negateConditionalsMutationInOtherMethod), mutater);
+        MutationDetails mathMutation =
+                createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, 10, THREE_INT_TO_INT_DESC);
+        MutationDetails mathMutationInOtherMethod =
+                createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, 50, EMPTY_TO_VOID_DESC);
+        MutationDetails negateConditionalsMutationInOtherMethod =
+                createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, 51, EMPTY_TO_VOID_DESC);
+        Collection<MutationDetails> remainingMutations = filter.intercept(
+                List.of(mathMutation, mathMutationInOtherMethod, negateConditionalsMutationInOtherMethod), mutater);
 
-        assertThat(remainingMutations).containsExactly(mathMutationInOtherMethod, negateConditionalsMutationInOtherMethod);
+        assertThat(remainingMutations)
+                .containsExactly(mathMutationInOtherMethod, negateConditionalsMutationInOtherMethod);
     }
 
     @Test
@@ -279,13 +315,17 @@ class AnnotationExclusionFilterTest {
 
         MethodTree methodTree = createMethodTree(classTree, "method", ANY_METHOD_DESC);
         String[] mathEnum = {PIT_MUTATOR_FQCN, String.valueOf(PitMutator.MATH)};
-        var annotations = List.of(createContainerAnnotation(List.of(List.of(MUTATOR_NAME, "NegateConditionals", MUTATOR, mathEnum))));
+        var annotations = List.of(
+                createContainerAnnotation(List.of(List.of(MUTATOR_NAME, "NegateConditionals", MUTATOR, mathEnum))));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
-        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, 10, ANY_METHOD_DESC);
-        MutationDetails negateConditionalsMutationInOtherMethod = createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, 15, ANY_METHOD_DESC);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, negateConditionalsMutationInOtherMethod), mutater);
+        MutationDetails mathMutation =
+                createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, 10, ANY_METHOD_DESC);
+        MutationDetails negateConditionalsMutationInOtherMethod =
+                createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, 15, ANY_METHOD_DESC);
+        Collection<MutationDetails> remainingMutations =
+                filter.intercept(List.of(mathMutation, negateConditionalsMutationInOtherMethod), mutater);
 
         assertThat(remainingMutations).containsExactly(negateConditionalsMutationInOtherMethod);
     }
@@ -297,21 +337,29 @@ class AnnotationExclusionFilterTest {
 
         MethodTree methodTree = createMethodTree(classTree, "method", ANY_METHOD_DESC);
         String[] mathEnum = {PIT_MUTATOR_FQCN, String.valueOf(PitMutator.MATH)};
-        var annotations = List.of(createContainerAnnotation(List.of(List.of(LINE, "InvalidInteger"),
-                List.of(MUTATOR, mathEnum, LINE, "otherInvalidInteger"), List.of(MUTATOR_NAME, "NegateConditionals", LINE, "A"))));
+        var annotations = List.of(createContainerAnnotation(List.of(
+                List.of(LINE, "InvalidInteger"),
+                List.of(MUTATOR, mathEnum, LINE, "otherInvalidInteger"),
+                List.of(MUTATOR_NAME, "NegateConditionals", LINE, "A"))));
         when(methodTree.annotations()).thenReturn(annotations);
 
         filter.begin(classTree);
-        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, 10, ANY_METHOD_DESC);
-        MutationDetails negateConditionalsMutationInOtherMethod = createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, 15, ANY_METHOD_DESC);
-        Collection<MutationDetails> remainingMutations = filter.intercept(List.of(mathMutation, negateConditionalsMutationInOtherMethod), mutater);
+        MutationDetails mathMutation =
+                createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, 10, ANY_METHOD_DESC);
+        MutationDetails negateConditionalsMutationInOtherMethod =
+                createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, 15, ANY_METHOD_DESC);
+        Collection<MutationDetails> remainingMutations =
+                filter.intercept(List.of(mathMutation, negateConditionalsMutationInOtherMethod), mutater);
 
         assertThat(remainingMutations).containsExactly(mathMutation, negateConditionalsMutationInOtherMethod);
     }
 
     @ParameterizedTest
     @MethodSource("provideTestCases")
-    void shouldSuppressMutationCorrectlyForAnnotations(final AnnotationNode methodAnnotations, final List<MutationDetails> mutations, final List<MutationDetails> expectedRemainingMutations) {
+    void shouldSuppressMutationCorrectlyForAnnotations(
+            final AnnotationNode methodAnnotations,
+            final List<MutationDetails> mutations,
+            final List<MutationDetails> expectedRemainingMutations) {
         ClassTree classTree = createClassTree(TEST_CLASS_FQCN);
         when(classTree.annotations()).thenReturn(List.of());
 
@@ -327,8 +375,10 @@ class AnnotationExclusionFilterTest {
 
     private static Stream<Arguments> provideTestCases() {
         int matchLine = 5;
-        MutationDetails mathMutation = createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, matchLine, THREE_INT_TO_INT_DESC);
-        MutationDetails negateConditionalsMutation = createMutation(TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, matchLine, THREE_INT_TO_INT_DESC);
+        MutationDetails mathMutation =
+                createMutation(TEST_CLASS_FQCN, "method", MATH_MUTATOR_FQCN, matchLine, THREE_INT_TO_INT_DESC);
+        MutationDetails negateConditionalsMutation = createMutation(
+                TEST_CLASS_FQCN, "method", NEGATE_CONDITIONALS_MUTATOR_FQCN, matchLine, THREE_INT_TO_INT_DESC);
 
         var mutations = List.of(mathMutation, negateConditionalsMutation);
         var bothMutations = List.of(mathMutation, negateConditionalsMutation);
@@ -349,19 +399,50 @@ class AnnotationExclusionFilterTest {
                 Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, otherName), mutations, bothMutations),
                 Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, matchName), mutations, bothMutations),
                 Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, otherName), mutations, bothMutations),
-                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, matchName, MUTATOR, matchMutator), mutations, onlyNegateMutation),
-                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, matchName, MUTATOR, otherMutator), mutations, bothMutations),
-                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, otherName, MUTATOR, matchMutator), mutations, onlyNegateMutation),
-                Arguments.of(createAnnotation(LINE, matchLine, MUTATOR_NAME, otherName, MUTATOR, otherMutator), mutations, bothMutations),
-                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, matchName, MUTATOR, matchMutator), mutations, bothMutations),
-                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, matchName, MUTATOR, otherMutator), mutations, bothMutations),
-                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, otherName, MUTATOR, matchMutator), mutations, bothMutations),
-                Arguments.of(createAnnotation(LINE, otherLine, MUTATOR_NAME, otherName, MUTATOR, otherMutator), mutations, bothMutations),
-                Arguments.of(createAnnotation(MUTATOR_NAME, matchName, MUTATOR, matchMutator), mutations, onlyNegateMutation),
-                Arguments.of(createAnnotation(MUTATOR_NAME, matchName, MUTATOR, otherMutator), mutations, bothMutations),
-                Arguments.of(createAnnotation(MUTATOR_NAME, otherName, MUTATOR, matchMutator), mutations, onlyNegateMutation),
-                Arguments.of(createAnnotation(MUTATOR_NAME, otherName, MUTATOR, otherMutator), mutations, bothMutations)
-        );
+                Arguments.of(
+                        createAnnotation(LINE, matchLine, MUTATOR_NAME, matchName, MUTATOR, matchMutator),
+                        mutations,
+                        onlyNegateMutation),
+                Arguments.of(
+                        createAnnotation(LINE, matchLine, MUTATOR_NAME, matchName, MUTATOR, otherMutator),
+                        mutations,
+                        bothMutations),
+                Arguments.of(
+                        createAnnotation(LINE, matchLine, MUTATOR_NAME, otherName, MUTATOR, matchMutator),
+                        mutations,
+                        onlyNegateMutation),
+                Arguments.of(
+                        createAnnotation(LINE, matchLine, MUTATOR_NAME, otherName, MUTATOR, otherMutator),
+                        mutations,
+                        bothMutations),
+                Arguments.of(
+                        createAnnotation(LINE, otherLine, MUTATOR_NAME, matchName, MUTATOR, matchMutator),
+                        mutations,
+                        bothMutations),
+                Arguments.of(
+                        createAnnotation(LINE, otherLine, MUTATOR_NAME, matchName, MUTATOR, otherMutator),
+                        mutations,
+                        bothMutations),
+                Arguments.of(
+                        createAnnotation(LINE, otherLine, MUTATOR_NAME, otherName, MUTATOR, matchMutator),
+                        mutations,
+                        bothMutations),
+                Arguments.of(
+                        createAnnotation(LINE, otherLine, MUTATOR_NAME, otherName, MUTATOR, otherMutator),
+                        mutations,
+                        bothMutations),
+                Arguments.of(
+                        createAnnotation(MUTATOR_NAME, matchName, MUTATOR, matchMutator),
+                        mutations,
+                        onlyNegateMutation),
+                Arguments.of(
+                        createAnnotation(MUTATOR_NAME, matchName, MUTATOR, otherMutator), mutations, bothMutations),
+                Arguments.of(
+                        createAnnotation(MUTATOR_NAME, otherName, MUTATOR, matchMutator),
+                        mutations,
+                        onlyNegateMutation),
+                Arguments.of(
+                        createAnnotation(MUTATOR_NAME, otherName, MUTATOR, otherMutator), mutations, bothMutations));
     }
 
     @Test
@@ -380,7 +461,8 @@ class AnnotationExclusionFilterTest {
         return createMethodTree(classTree, methodName, ANY_METHOD_DESC);
     }
 
-    private static MethodTree createMethodTree(final ClassTree classTree, final String methodName, final String descriptor) {
+    private static MethodTree createMethodTree(
+            final ClassTree classTree, final String methodName, final String descriptor) {
         MethodTree methodTree = mock(MethodTree.class);
         Location location = mock(Location.class);
         when(methodTree.asLocation()).thenReturn(location);
@@ -420,10 +502,14 @@ class AnnotationExclusionFilterTest {
         return createMutation(TEST_CLASS_FQCN, methodName, mutatorFqcn, lineNumber, ANY_METHOD_DESC);
     }
 
-    private static MutationDetails createMutation(final String className, final String methodName, final String mutatorFqcn, final int lineNumber, final String descriptor) {
+    private static MutationDetails createMutation(
+            final String className,
+            final String methodName,
+            final String mutatorFqcn,
+            final int lineNumber,
+            final String descriptor) {
         var id = new MutationIdentifier(
-                Location.location(ClassName.fromString(className), methodName, descriptor), 0, mutatorFqcn
-        );
+                Location.location(ClassName.fromString(className), methodName, descriptor), 0, mutatorFqcn);
         return new MutationDetails(id, "File.java", "desc", lineNumber, 0);
     }
 }
