@@ -1,5 +1,11 @@
 package edu.hm.hafner.pitmute;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -8,17 +14,11 @@ import org.pitest.mutationtest.build.InterceptorType;
 import org.pitest.mutationtest.engine.Mutater;
 import org.pitest.mutationtest.engine.MutationDetails;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
 class CsvExclusionFilterTest {
     private static final String MAIN_FQCN = "com.example.Main";
     private static final String MATH_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.MathMutator";
-    private static final String PRIMITIVE_RETURNS_MUTATOR_FQCN = "org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator";
+    private static final String PRIMITIVE_RETURNS_MUTATOR_FQCN =
+            "org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator";
     private final Mutater mutater = mock(Mutater.class);
 
     @Test
@@ -52,32 +52,41 @@ class CsvExclusionFilterTest {
 
     @Test
     void interceptShouldRemoveMutationInOneOfTwoClassesWithSameName() {
-        var exclusionEntry = new CsvExclusionEntry(MAIN_FQCN, Optional.of("MathMutator"), Optional.of(5), Optional.of(5));
+        var exclusionEntry =
+                new CsvExclusionEntry(MAIN_FQCN, Optional.of("MathMutator"), Optional.of(5), Optional.of(5));
         var csvExclusionFilter = new CsvExclusionFilter(List.of(exclusionEntry));
 
         var mutation = createMutation(MAIN_FQCN, MATH_MUTATOR_FQCN, 5);
         var mutation2 = createMutation("com.example.otherPackage.Main", MATH_MUTATOR_FQCN, 5);
 
-        Collection<MutationDetails> filteredMutations = csvExclusionFilter.intercept(List.of(mutation, mutation2), mutater);
+        Collection<MutationDetails> filteredMutations =
+                csvExclusionFilter.intercept(List.of(mutation, mutation2), mutater);
 
         assertThat(filteredMutations).containsExactly(mutation2);
     }
 
     @ParameterizedTest(name = "{index} => className: {0}, mutationName: {1}, startLine: {2}, endLine: {3}")
-    @CsvSource(value = {
-            "com.example.Main, null, null, null",
-            "com.example.Main, org.pitest.mutationtest.engine.gregor.mutators.MathMutator, null, null",
-            "com.example.Main, MathMutator, null, null",
-            "com.example.Main, Math, null, null",
-            "com.example.Main, null, 5, null",
-            "com.example.Main, null, 4, null",
-            "com.example.Main, null, 5, 5",
-            "com.example.Main, null, null, 5",
-            "com.example.Main, null, null, 6",
-            "com.example.Main, MathMutator, 5, 5"
-    }, nullValues = "null")
-    void interceptShouldReturnEmptyCollectionAsMutationMatchesExclusionEntry(final String className, final String mutationName, final Integer startLine, final Integer endLine) {
-        var exclusionEntry = new CsvExclusionEntry(className, Optional.ofNullable(mutationName), Optional.ofNullable(startLine), Optional.ofNullable(endLine));
+    @CsvSource(
+            value = {
+                "com.example.Main, null, null, null",
+                "com.example.Main, org.pitest.mutationtest.engine.gregor.mutators.MathMutator, null, null",
+                "com.example.Main, MathMutator, null, null",
+                "com.example.Main, Math, null, null",
+                "com.example.Main, null, 5, null",
+                "com.example.Main, null, 4, null",
+                "com.example.Main, null, 5, 5",
+                "com.example.Main, null, null, 5",
+                "com.example.Main, null, null, 6",
+                "com.example.Main, MathMutator, 5, 5"
+            },
+            nullValues = "null")
+    void interceptShouldReturnEmptyCollectionAsMutationMatchesExclusionEntry(
+            final String className, final String mutationName, final Integer startLine, final Integer endLine) {
+        var exclusionEntry = new CsvExclusionEntry(
+                className,
+                Optional.ofNullable(mutationName),
+                Optional.ofNullable(startLine),
+                Optional.ofNullable(endLine));
         var csvExclusionFilter = new CsvExclusionFilter(List.of(exclusionEntry));
         var mutation = createMutation(MAIN_FQCN, MATH_MUTATOR_FQCN, 5);
 
@@ -87,17 +96,24 @@ class CsvExclusionFilterTest {
     }
 
     @ParameterizedTest(name = "{index} => className: {0}, mutationName: {1}, startLine: {2}, endLine: {3}")
-    @CsvSource(value = {
-            "null, null, null, null",
-            "com.example.Main, null, 6, null",
-            "com.example.Main, null, null, 4",
-            "com.example.Main, null, 1, 4",
-            "com.example.Main, null, 6, 10",
-            "com.example.Main, org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator, null, null",
-            "com.example.Main, PrimitiveReturnsMutator, null, null"
-    }, nullValues = "null")
-    void interceptShouldKeepMutationAsExclusionEntryDoesNotMatch(final String className, final String mutationName, final Integer startLine, final Integer endLine) {
-        var exclusionEntry = new CsvExclusionEntry(className, Optional.ofNullable(mutationName), Optional.ofNullable(startLine), Optional.ofNullable(endLine));
+    @CsvSource(
+            value = {
+                "null, null, null, null",
+                "com.example.Main, null, 6, null",
+                "com.example.Main, null, null, 4",
+                "com.example.Main, null, 1, 4",
+                "com.example.Main, null, 6, 10",
+                "com.example.Main, org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator, null, null",
+                "com.example.Main, PrimitiveReturnsMutator, null, null"
+            },
+            nullValues = "null")
+    void interceptShouldKeepMutationAsExclusionEntryDoesNotMatch(
+            final String className, final String mutationName, final Integer startLine, final Integer endLine) {
+        var exclusionEntry = new CsvExclusionEntry(
+                className,
+                Optional.ofNullable(mutationName),
+                Optional.ofNullable(startLine),
+                Optional.ofNullable(endLine));
         var csvExclusionFilter = new CsvExclusionFilter(List.of(exclusionEntry));
 
         var mutation = createMutation(MAIN_FQCN, MATH_MUTATOR_FQCN, 5);
@@ -110,8 +126,10 @@ class CsvExclusionFilterTest {
     @Test
     void shouldHandleMultipleExclusionEntriesCorrectly() {
         var entry1 = new CsvExclusionEntry(MAIN_FQCN, Optional.of("MathMutator"), Optional.of(5), Optional.of(5));
-        var entry2 = new CsvExclusionEntry(MAIN_FQCN, Optional.of("PrimitiveReturnsMutator"), Optional.of(1), Optional.of(5));
-        var entry3 = new CsvExclusionEntry(MAIN_FQCN, Optional.of("PrimitiveReturnsMutator"), Optional.of(4), Optional.of(7));
+        var entry2 = new CsvExclusionEntry(
+                MAIN_FQCN, Optional.of("PrimitiveReturnsMutator"), Optional.of(1), Optional.of(5));
+        var entry3 = new CsvExclusionEntry(
+                MAIN_FQCN, Optional.of("PrimitiveReturnsMutator"), Optional.of(4), Optional.of(7));
 
         var filter = new CsvExclusionFilter(List.of(entry1, entry2, entry3));
 
@@ -135,13 +153,10 @@ class CsvExclusionFilterTest {
     }
 
     @ParameterizedTest(name = "{index} => className: {0}")
-    @CsvSource({
-            "com.example.Main",
-            "Main.java",
-            "Main"
-    })
+    @CsvSource({"com.example.Main", "Main.java", "Main"})
     void interceptShouldMatchClassNames(final String className) {
-        var exclusionEntry = new CsvExclusionEntry(className, Optional.of("MathMutator"), Optional.empty(), Optional.empty());
+        var exclusionEntry =
+                new CsvExclusionEntry(className, Optional.of("MathMutator"), Optional.empty(), Optional.empty());
         var csvExclusionFilter = new CsvExclusionFilter(List.of(exclusionEntry));
         var mutation = createMutation(MAIN_FQCN, MATH_MUTATOR_FQCN, 5);
 
@@ -152,15 +167,16 @@ class CsvExclusionFilterTest {
 
     @ParameterizedTest(name = "{index} => className: {0}")
     @CsvSource({
-            "com.example.Main.java",
-            "src.main.java.com.example.Main",
-            "OtherMain.java",
-            "OtherMain",
-            "MainClass",
-            ".java"
+        "com.example.Main.java",
+        "src.main.java.com.example.Main",
+        "OtherMain.java",
+        "OtherMain",
+        "MainClass",
+        ".java"
     })
     void interceptShouldNotMatchWithInvalidClassNameFormats(final String className) {
-        var exclusionEntry = new CsvExclusionEntry(className, Optional.of("MathMutator"), Optional.empty(), Optional.empty());
+        var exclusionEntry =
+                new CsvExclusionEntry(className, Optional.of("MathMutator"), Optional.empty(), Optional.empty());
         var csvExclusionFilter = new CsvExclusionFilter(List.of(exclusionEntry));
         var mutation = createMutation(MAIN_FQCN, MATH_MUTATOR_FQCN, 5);
 

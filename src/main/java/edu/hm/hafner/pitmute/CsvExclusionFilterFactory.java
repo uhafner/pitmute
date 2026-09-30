@@ -1,11 +1,6 @@
 package edu.hm.hafner.pitmute;
 
 import edu.hm.hafner.util.VisibleForTesting;
-import org.pitest.mutationtest.build.InterceptorParameters;
-import org.pitest.mutationtest.build.MutationInterceptor;
-import org.pitest.mutationtest.build.MutationInterceptorFactory;
-import org.pitest.plugin.Feature;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,19 +9,19 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.pitest.mutationtest.build.InterceptorParameters;
+import org.pitest.mutationtest.build.MutationInterceptor;
+import org.pitest.mutationtest.build.MutationInterceptorFactory;
+import org.pitest.plugin.Feature;
 
 /**
  * Factory for creating a {@link CsvExclusionFilter} using exclusion rules defined in a CSV file.
  *
- * <p>
- * The CSV is parsed and each valid row is mapped to a {@link CsvExclusionEntry}.
- * These entries are then used to suppress generated PIT mutations according to the configured rules.
- * </p>
+ * <p>The CSV is parsed and each valid row is mapped to a {@link CsvExclusionEntry}. These entries are then used to
+ * suppress generated PIT mutations according to the configured rules.
  *
- * <p>
- * The path to the CSV file must be specified in the PIT feature configuration within the <code>pom.xml</code>.
- * For more information on the expected CSV format, please refer to the project's README file.
- * </p>
+ * <p>The path to the CSV file must be specified in the PIT feature configuration within the <code>pom.xml</code>. For
+ * more information on the expected CSV format, please refer to the project's README file.
  */
 public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
     private static final String CSV_SEPARATOR = ",";
@@ -34,16 +29,13 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
     private final Logger logger;
     private boolean allowMissingFile = false;
 
-    /**
-     * Creates a {@code CsvExclusionFilterFactory} and initializes the logger.
-     */
+    /** Creates a {@code CsvExclusionFilterFactory} and initializes the logger. */
     public CsvExclusionFilterFactory() {
         this.logger = Logger.getLogger(CsvExclusionFilterFactory.class.getName());
     }
 
     /**
-     * Constructor for testing purposes.
-     * Allows injection of a mock logger.
+     * Constructor for testing purposes. Allows injection of a mock logger.
      *
      * @param logger the logger to use
      */
@@ -82,9 +74,12 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
 
             String[] fields = line.split(CSV_SEPARATOR, -1);
             if (fields.length > MIN_FIELDS) {
-                logger.log(Level.WARNING, "Skipping invalid line {0}: it contains too many fields. "
-                        + "A line may contain a maximum of four fields (className, mutator (optional), "
-                        + "startLine (optional), endLine (optional)).", lineNumber);
+                logger.log(
+                        Level.WARNING,
+                        "Skipping invalid line {0}: it contains too many fields. "
+                                + "A line may contain a maximum of four fields (className, mutator (optional), "
+                                + "startLine (optional), endLine (optional)).",
+                        lineNumber);
                 continue;
             }
             fields = Arrays.copyOf(fields, MIN_FIELDS);
@@ -101,10 +96,8 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
                         classNameOptional.get(),
                         normalize(fields[1]),
                         tryParseInteger(fields[2]),
-                        tryParseInteger(fields[3])
-                ));
-            }
-            catch (IllegalArgumentException e) {
+                        tryParseInteger(fields[3])));
+            } catch (IllegalArgumentException e) {
                 logger.log(Level.WARNING, "Skipping invalid line: {0}", lineNumber);
             }
         }
@@ -114,23 +107,25 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
     private List<String> readLines(final String csvPath) {
         try {
             return Files.readAllLines(Paths.get(csvPath), StandardCharsets.UTF_8);
-        }
-        catch (NoSuchFileException e) {
+        } catch (NoSuchFileException e) {
             if (allowMissingFile) {
-                logger.log(Level.INFO,
+                logger.log(
+                        Level.INFO,
                         "Mutation exclusion via CSV is enabled and the path is configured, "
                                 + "but no CSV file was found. "
                                 + "To use this feature, add a CSV file at the specified location: ");
                 return List.of();
+            } else {
+                throw new IllegalStateException(
+                        "Failed to read CSV file. Please verify that the path is correct " + "and the file exists: "
+                                + csvPath,
+                        e);
             }
-            else {
-                throw new IllegalStateException("Failed to read CSV file. Please verify that the path is correct "
-                        + "and the file exists: " + csvPath, e);
-            }
-        }
-        catch (IOException e) {
-            throw new IllegalStateException("Failed to read CSV file. Please verify that the path is correct "
-                    + "and the file is readable: " + csvPath, e);
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Failed to read CSV file. Please verify that the path is correct " + "and the file is readable: "
+                            + csvPath,
+                    e);
         }
     }
 
@@ -144,8 +139,7 @@ public class CsvExclusionFilterFactory implements MutationInterceptorFactory {
         }
         try {
             return Optional.of(Integer.parseInt(string.trim()));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid integer: " + string, e);
         }
     }
