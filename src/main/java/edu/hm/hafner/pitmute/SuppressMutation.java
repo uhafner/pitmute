@@ -2,7 +2,11 @@ package edu.hm.hafner.pitmute;
 
 import static edu.hm.hafner.pitmute.PitMutator.NONE;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Suppresses specific mutations when the feature {@code FANNOT} is enabled in PitMute.
